@@ -1,0 +1,3 @@
+/home/aj/Dropbox (CSUCI)/Teaching/Fall2018/COMP362-F18/labs/proj01/simfs/cmake-build-debug/CMakeFiles/rebuild_cache.dir
+/home/aj/Dropbox (CSUCI)/Teaching/Fall2018/COMP362-F18/labs/proj01/simfs/cmake-build-debug/CMakeFiles/edit_cache.dir
+/home/aj/Dropbox (CSUCI)/Teaching/Fall2018/COMP362-F18/labs/proj01/simfs/cmake-build-debug/CMakeFiles/simfs.dir
