@@ -1,4 +1,3 @@
-
 #include "simfs.h"
 
 //////////////////////////////////////////////////////////////////////////
@@ -8,6 +7,7 @@
 //////////////////////////////////////////////////////////////////////////
 
 SIMFS_CONTEXT_TYPE simfsContext; // all in-memory information about the system
+SIMFS_VOLUME *simfs_Volume;
 
 //////////////////////////////////////////////////////////////////////////
 //
@@ -29,6 +29,8 @@ SIMFS_CONTEXT_TYPE simfsContext; // all in-memory information about the system
  */
 SIMFS_ERROR simfsMountFileSystem(SIMFS_VOLUME *fileSystem)
 {
+    //not sure where the following goes
+    simfs_Volume = fileSystem;
     // TODO: implement
 
     return SIMFS_NO_ERROR;
@@ -57,7 +59,25 @@ SIMFS_ERROR simfsMountFileSystem(SIMFS_VOLUME *fileSystem)
  */
 SIMFS_ERROR simfsCreateFile(SIMFS_NAME_TYPE fileName, SIMFS_CONTENT_TYPE type)
 {
-    // TODO: implement
+
+    SIMFS_FILE_DESCRIPTOR_TYPE *descriptorBuffer = (SIMFS_FILE_DESCRIPTOR_TYPE*)malloc(sizeof(SIMFS_FILE_DESCRIPTOR_TYPE));
+    time(&descriptorBuffer->creationTime);
+    descriptorBuffer->lastAccessTime = descriptorBuffer->creationTime;
+    descriptorBuffer->lastModificationTime = descriptorBuffer->creationTime;
+    descriptorBuffer->size = SIMFS_BLOCK_SIZE;
+    descriptorBuffer->name = fileName;
+
+    switch(type){
+        case FOLDER_CONTENT_TYPE:
+            descriptorBuffer->type = type;
+            break;
+        case FILE_CONTENT_TYPE:
+            descriptorBuffer->type = type;
+            break;
+        default:
+            printf("ERROR\n");
+            break;
+    }
 
     return SIMFS_NO_ERROR;
 }
