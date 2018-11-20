@@ -27,11 +27,189 @@ SIMFS_VOLUME *simfs_Volume;
  * be changed as the user navigates the file system hierarchy.
  *
  */
-SIMFS_ERROR simfsMountFileSystem(SIMFS_VOLUME *fileSystem)
+
+/*
+ * Retuns a hash value within the limits of the directory.
+ */
+inline unsigned long hash(unsigned char *str)
 {
-    //not sure where the following goes
-    simfs_Volume = fileSystem;
-    // TODO: implement
+    register unsigned long hash = 5381;
+    register unsigned char c;
+
+    while ((c = *str++) != '\0')
+        hash = ((hash << 5) + hash) ^ c; /* hash * 33 + c */
+
+    return hash % SIMFS_DIRECTORY_SIZE;
+}
+
+/*
+ * Find a free block in a bit vector.
+ */
+inline unsigned short simfsFindFreeBlock(unsigned char *bitvector)
+{
+    unsigned short i = 0;
+    while (bitvector[i] == 0xFF)
+        i += 1;
+
+    register unsigned char mask = 0x80;
+    unsigned short j = 0;
+    while (bitvector[i] & mask)
+        mask >>= ++j;
+
+    return (i * 8) + j; // i bytes and j bits are all "1", so this formula points to the first "0"
+}
+
+/*
+ * Three functions for bit manipulation.
+ */
+inline void simfsFlipBit(unsigned char *bitvector, unsigned short bitIndex)
+{
+    unsigned short blockIndex = bitIndex / 8;
+    unsigned short bitShift = bitIndex % 8;
+
+    register unsigned char mask = 0x80;
+    bitvector[blockIndex] ^= (mask >> bitShift);
+}
+
+inline void simfsSetBit(unsigned char *bitvector, unsigned short bitIndex)
+{
+    unsigned short blockIndex = bitIndex / 8;
+    unsigned short bitShift = bitIndex % 8;
+
+    register unsigned char mask = 0x80;
+    bitvector[blockIndex] |= (mask >> bitShift);}
+
+inline void simfsClearBit(unsigned char *bitvector, unsigned short bitIndex)
+{
+    unsigned short blockIndex = bitIndex / 8;
+    unsigned short bitShift = bitIndex % 8;
+
+    register unsigned char mask = 0x80;
+    bitvector[blockIndex] &= ~(mask >> bitShift);
+}
+
+/*
+ * Allocates space for the file system and saves it to disk.
+ */
+SIMFS_ERROR simfsCreateFileSystem(char *simfsFileName)
+{
+
+    FILE *file = fopen(simfsFileName, "wb");
+    if (file == NULL)
+        return SIMFS_ALLOC_ERROR;
+
+    simfsContext = malloc(sizeof(SIMFS_CONTEXT_TYPE));
+    if (simfsContext == NULL)
+        return SIMFS_ALLOC_ERROR;
+
+    simfsVolume = malloc(sizeof(SIMFS_VOLUME));
+    if (simfsVolume == NULL)
+        return SIMFS_ALLOC_ERROR;
+
+    // initialize the superblock
+
+    simfsVolume->superblock.attr.rootNodeIndex = 0;
+    simfsVolume->superblock.attr.blockSize = SIMFS_BLOCK_SIZE;
+    simfsVolume->superblock.attr.numberOfBlocks = SIMFS_NUMBER_OF_BLOCKS;
+
+    // initialize the blocks holding the root folder
+
+    // initialize the root folder
+
+    simfsVolume->block[0].type = SIMFS_FOLDER_CONTENT_TYPE;
+    simfsVolume->block[0].content.fileDescriptor.type = SIMFS_FOLDER_CONTENT_TYPE;
+    strcpy(simfsVolume->block[0].content.fileDescriptor.name, "/");
+    simfsVolume->block[0].content.fileDescriptor.accessRights = umask(00000);
+    simfsVolume->block[0].content.fileDescriptor.owner = 0; // arbitrarily simulated
+    simfsVolume->block[0].content.fileDescriptor.size = 0;
+
+    struct timespec time;
+    clock_gettime(CLOCK_MONOTONIC, &time);
+    simfsVolume->block[0].content.fileDescriptor.creationTime = time.tv_sec;
+    simfsVolume->block[0].content.fileDescriptor.lastAccessTime = time.tv_sec;
+    simfsVolume->block[0].content.fileDescriptor.lastModificationTime = time.tv_sec;
+
+    // initialize the index block of the root folder
+
+    // first, point from the root file descriptor to the index block
+    simfsVolume->block[0].content.fileDescriptor.block_ref = 1;
+
+    simfsVolume->block[1].type = SIMFS_INDEX_CONTENT_TYPE;
+
+    // indicate that the blocks #0 and #1 are allocated
+
+    // using the function to find a free block for testing purposes
+    simfsFlipBit(simfsVolume->bitvector, simfsFindFreeBlock(simfsVolume->bitvector)); // should be 0
+    simfsFlipBit(simfsVolume->bitvector, simfsFindFreeBlock(simfsVolume->bitvector)); // should be 1
+
+    // sample alternative #1 - illustration of bit-wise operations
+//    simfsVolume->bitvector[0] = 0;
+//    simfsVolume->bitvector[0] |= 0x01 << 7; // set the first bit of the bit vector
+//    simfsVolume->bitvector[0] += 0x80 >> 1; // flip the first bit of the bit vector
+
+    // sample alternative #2 - less educational, but fastest
+//     simfsVolume->bitvector[0] = 0xC0;
+    // 0xC0 is 11000000 in binary (showing the root block and root's index block taken)
+
+    fwrite(simfsVolume, 1, sizeof(SIMFS_VOLUME), file);
+
+    fclose(file);
+
+    return SIMFS_NO_ERROR;
+}
+
+/*
+ * Loads the file system from a disk and constructs in-memory directory of all files is the system.
+ *
+ * Starting with the file system root (pointed to from the superblock) traverses the hierarachy of directories
+ * and adds en entry for each folder or file to the directory by hashing the name and adding a directory
+ * entry node to the conflict resolution list for that entry. If the entry is NULL, the new node will be
+ * the only element of that list.
+ *
+ * The function sets the current working directory to refer to the block holding the root of the volume. This will
+ * be changed as the user navigates the file system hierarchy.
+ *
+ */
+
+SIMFS_ERROR simfsMountFileSystem(char *simfsFileName)
+{
+    simfsContext = malloc(sizeof(SIMFS_CONTEXT_TYPE));
+    if (simfsContext == NULL)
+        return SIMFS_ALLOC_ERROR;
+
+    simfsVolume = malloc(sizeof(SIMFS_VOLUME));
+    if (simfsVolume == NULL)
+        return SIMFS_ALLOC_ERROR;
+
+    FILE *file = fopen(simfsFileName, "rb");
+    if (file == NULL)
+        return SIMFS_ALLOC_ERROR;
+
+    fread(simfsVolume, 1, sizeof(SIMFS_VOLUME), file);
+    fclose(file);
+    return SIMFS_NO_ERROR;
+
+    // TODO: complete
+
+}
+
+/*
+ * Saves the file system to a disk and de-allocates the memory.
+ *
+ * Assumes that all synchronization has been done.
+ *
+ */
+SIMFS_ERROR simfsUmountFileSystem(char *simfsFileName)
+{
+    FILE *file = fopen(simfsFileName, "wb");
+    if (file == NULL)
+        return SIMFS_ALLOC_ERROR;
+
+    fwrite(simfsVolume, 1, sizeof(SIMFS_VOLUME), file);
+    fclose(file);
+
+    free(simfsVolume);
+    free(simfsContext);
 
     return SIMFS_NO_ERROR;
 }
@@ -59,25 +237,39 @@ SIMFS_ERROR simfsMountFileSystem(SIMFS_VOLUME *fileSystem)
  */
 SIMFS_ERROR simfsCreateFile(SIMFS_NAME_TYPE fileName, SIMFS_CONTENT_TYPE type)
 {
+    unsigned long hashedName = hash(fileName);
+    SIMFS_DIR_ENT currentDirectory = simfsContext->directory[hashedName];
+    while(currentDirectory != NULL){
+        if(strcmp(simfs_Volume->block[currentDirectory.nodeReference].content.fileDescriptor.name,fileName) == 0)
+            return SIMFS_DUPLICATE_ERROR;
+        currentDirectory = *(currentDirectory.next);
+    }
 
     SIMFS_FILE_DESCRIPTOR_TYPE *descriptorBuffer = (SIMFS_FILE_DESCRIPTOR_TYPE*)malloc(sizeof(SIMFS_FILE_DESCRIPTOR_TYPE));
+    SIMFS_FILE_DESCRIPTOR_TYPE *indexBuffer;
     time(&descriptorBuffer->creationTime);
     descriptorBuffer->lastAccessTime = descriptorBuffer->creationTime;
     descriptorBuffer->lastModificationTime = descriptorBuffer->creationTime;
-    descriptorBuffer->size = SIMFS_BLOCK_SIZE;
+    descriptorBuffer->size = 0; //always initialize to 0 which means empty file/folder(may change in the future)
     descriptorBuffer->name = fileName;
+    descriptorBuffer->type = type;
 
-    switch(type){
-        case FOLDER_CONTENT_TYPE:
-            descriptorBuffer->type = type;
-            break;
-        case FILE_CONTENT_TYPE:
-            descriptorBuffer->type = type;
-            break;
-        default:
-            printf("ERROR\n");
-            break;
-    }
+    unsigned short freeBitIndex = simfsFindFreeBlock(simfsContext->bitvector);
+    simfsFlipBit(simfsContext->bitvector,freeBitIndex);
+    simfs_Volume->block[freeBitIndex].content.fileDescriptor = *descriptorBuffer;
+
+
+    if(type == FILE_CONTENT_TYPE)
+            descriptorBuffer->block_ref = SIMFS_INVALID_INDEX;
+    else if(type == FOLDER_CONTENT_TYPE){
+            freeBitIndex = simfsFindFreeBlock(simfsContext->bitvector);
+            simfsFlipBit(simfsContext->bitvector,freeBitIndex);
+            simfs_Volume->block[freeBitIndex].type = INDEX_CONTENT_TYPE;
+        }
+
+    
+
+    simfsVolume->bitvector = simfsContext->bitvector;
 
     return SIMFS_NO_ERROR;
 }
@@ -102,7 +294,60 @@ SIMFS_ERROR simfsCreateFile(SIMFS_NAME_TYPE fileName, SIMFS_CONTENT_TYPE type)
  */
 SIMFS_ERROR simfsDeleteFile(SIMFS_NAME_TYPE fileName)
 {
-    // TODO: implement
+    unsigned long hashedName = hash(fileName);
+    SIMFS_DIR_ENT currentDirectory = simfsContext->directory[hashedName];
+    SIMFS_DIR_ENT prevDirectory = currentDirectory;
+    while(currentDirectory != NULL){
+        if(strcmp(simfs_Volume->block[currentDirectory.nodeReference].content.fileDescriptor.name,fileName) == 0)
+            break;
+        prevDirectory = currentDirectory;
+        currentDirectory = *(currentDirectory.next);
+    }
+    if(currentDirectory != NULL){
+        prevDirectory.next = currentDirectory.next;
+    }
+    else(currentDirectory == NULL){
+        return SIMFS_NOT_FOUND_ERROR;
+    }
+
+    if(simfsVolume->block[currentDirectory.nodeReference].type == FOLDER_CONTENT_TYPE && simfsVolume->block[currentDirectory.nodeReference].content.fileDescriptor.size > 0){
+        return SIMFS_NOT_EMPTY_ERROR;
+    }
+
+    unsigned char mask = 0200; //bitmask representing owners ability to write to file
+    if((mask & simfsVolume->block[currentDirectory.nodeReference].content.fileDescriptor.accessRights) != mask)
+        return SIMFS_ACCESS_ERROR;
+
+    SIMFS_FILE_DESCRIPTOR_TYPE currFileDescriptor = simfsVolume->block[currentDirectory.nodeReference].content.fileDescriptor;
+    SIMFS_INDEX_TYPE referenceBlock = currFileDescriptor.block_ref;
+
+    simfsFlipBit(simfsContext->bitvector, currentDirectory.nodeReference); //remove file descriptor
+
+    if(currFileDescriptor.size <= SIMFS_DATA_SIZE){
+        simfsFlipBit(simfsContext->bitvector, referenceBlock); //remove data node
+        simfsVolume->bitvector = simfsContext->bitvector;
+
+        return SIMFS_NO_ERROR;
+    }
+    SIMFS_INDEX_TYPE *currIndex = simfsContext->bitvector[referenceBlock];
+    int currCount = 0;
+    int numOfBlocksToFree = currFileDescriptor.size / SIMFS_DATA_SIZE;
+    if(currFileDescriptor.size % SIMFS_DATA_SIZE)
+        numOfBlocksToFree++;
+    while(currCount < numOfBlocksToFree){
+        if(currCount+1 % SIMFS_INDEX_SIZE != 0){
+            simfsFlipBit(simfsContext->bitvector, currIndex[currCount%SIMFS_DATA_SIZE]); //remove each data node
+        }
+        else{
+            numOfBlocksToFree++;
+            simfsFlipBit(simfsContext->bitvector, referenceBlock); //remove current Index node and update
+            referenceBlock = currIndex[currCount%SIMFS_DATA_SIZE];
+            currIndex = simfsContext->bitvector[currCount%SIMFS_DATA_SIZE];
+        }
+        currCount++;
+    }
+        simfsVolume->bitvector = simfsContext->bitvector;
+
 
     return SIMFS_NO_ERROR;
 }
@@ -117,9 +362,17 @@ SIMFS_ERROR simfsDeleteFile(SIMFS_NAME_TYPE fileName)
  */
 SIMFS_ERROR simfsGetFileInfo(SIMFS_NAME_TYPE fileName, SIMFS_FILE_DESCRIPTOR_TYPE *infoBuffer)
 {
-    // TODO: implement
+    unsigned long hashedName = hash(fileName);
+    SIMFS_DIR_ENT currentDirectory = simfsContext->directory[hashedName];
+    while(currentDirectory != NULL){
+        if(strcmp(simfs_Volume->block[currentDirectory.nodeReference].content.fileDescriptor.name,fileName) == 0){
+            infoBuffer = &(simfs_Volume->block[currentDirectory.nodeReference].content.fileDescriptor);
+            return SIMFS_NO_ERROR;
+        }
+        currentDirectory = *(currentDirectory.next);
+    }
 
-    return SIMFS_NO_ERROR;
+    return SIMFS_NOT_FOUND_ERROR;
 }
 
 //////////////////////////////////////////////////////////////////////////

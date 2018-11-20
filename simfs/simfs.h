@@ -12,11 +12,11 @@
 //
 //////////////////////////////////////////////////////////////////////////
 
-#define SIMFS_BLOCK_SIZE 256
-#define SIMFS_NUMBER_OF_BLOCKS 65536 // 2^16
-#define SIMFS_MAX_NAME_LENGTH 128
-#define SIMFS_DATA_SIZE 254 // SIMFS_BLOCK_SIZE - sizeof(SIMFS_NODE_TYPE)
-#define SIMFS_INDEX_SIZE 127 // two bytes => x0000 - xFFFF => 2^16 range
+#define SIMFS_BLOCK_SIZE 16
+#define SIMFS_NUMBER_OF_BLOCKS 4096 // 2^16
+#define SIMFS_MAX_NAME_LENGTH 64
+#define SIMFS_DATA_SIZE 14 // SIMFS_BLOCK_SIZE - sizeof(SIMFS_NODE_TYPE)
+#define SIMFS_INDEX_SIZE 7 // two bytes => x0000 - xFFFF => 2^16 range
 
 //////////////////////////////////////////////////////////////////////////
 //
@@ -221,6 +221,16 @@ SIMFS_ERROR simfsWriteFile(SIMFS_FILE_HANDLE_TYPE fileHandle, char *writeBuffer)
 SIMFS_ERROR simfsReadFile(SIMFS_FILE_HANDLE_TYPE fileHandle, char **readBuffer);
 
 SIMFS_ERROR simfsCloseFile(SIMFS_FILE_HANDLE_TYPE fileHandle);
+
+SIMFS_ERROR simfsCreateFileSystem(char *simfsFileName);
+SIMFS_ERROR simfsUmountFileSystem(char *simfsFileName);
+SIMFS_ERROR simfsMountFileSystem(char *simfsFileName);
+// ... other functions already in there
+unsigned long hash(unsigned char *str);
+void simfsFlipBit(unsigned char *bitvector, unsigned short bitIndex);
+void simfsSetBit(unsigned char *bitvector, unsigned short bitIndex);
+void simfsClearBit(unsigned char *bitvector, unsigned short bitIndex);
+unsigned short simfsFindFreeBlock(unsigned char *bitvector);
 
 /*
  * The following functions can be used to simulate FUSE context's user and process identifiers for testing.
