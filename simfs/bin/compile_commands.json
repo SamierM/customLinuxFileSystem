@@ -1,0 +1,12 @@
+[
+{
+  "directory": "/home/samier/Desktop/School/Fall 2018/Operating-Systems/Project1/simfs/bin",
+  "command": "/usr/bin/cc  -I/usr/include/fuse   -D_FILE_OFFSET_BITS=64   -std=gnu11 -o CMakeFiles/simfs.dir/test_simfs.c.o   -c \"/home/samier/Desktop/School/Fall 2018/Operating-Systems/Project1/simfs/test_simfs.c\"",
+  "file": "/home/samier/Desktop/School/Fall 2018/Operating-Systems/Project1/simfs/test_simfs.c"
+},
+{
+  "directory": "/home/samier/Desktop/School/Fall 2018/Operating-Systems/Project1/simfs/bin",
+  "command": "/usr/bin/cc  -I/usr/include/fuse   -D_FILE_OFFSET_BITS=64   -std=gnu11 -o CMakeFiles/simfs.dir/simfs.c.o   -c \"/home/samier/Desktop/School/Fall 2018/Operating-Systems/Project1/simfs/simfs.c\"",
+  "file": "/home/samier/Desktop/School/Fall 2018/Operating-Systems/Project1/simfs/simfs.c"
+}
+]

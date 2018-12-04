@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <fuse.h>
+#include <stdio.h>
 
 //////////////////////////////////////////////////////////////////////////
 //
@@ -206,7 +207,6 @@ typedef enum simfs_error {
     SIMFS_READ_ERROR
 } SIMFS_ERROR;
 
-SIMFS_ERROR simfsMountFileSystem(SIMFS_VOLUME *fileSystem);
 
 SIMFS_ERROR simfsCreateFile(SIMFS_NAME_TYPE fileName, SIMFS_CONTENT_TYPE type);
 

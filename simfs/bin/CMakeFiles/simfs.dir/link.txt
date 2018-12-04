@@ -1,0 +1,1 @@
+/usr/bin/cc  -D_FILE_OFFSET_BITS=64   CMakeFiles/simfs.dir/test_simfs.c.o CMakeFiles/simfs.dir/simfs.c.o  -o bin/simfs /usr/lib/x86_64-linux-gnu/libfuse.so 

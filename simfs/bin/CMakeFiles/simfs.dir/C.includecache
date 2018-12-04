@@ -1,0 +1,68 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/samier/Desktop/School/Fall 2018/Operating-Systems/Project1/simfs/simfs.c
+simfs.h
+/home/samier/Desktop/School/Fall 2018/Operating-Systems/Project1/simfs/simfs.h
+
+/home/samier/Desktop/School/Fall 2018/Operating-Systems/Project1/simfs/simfs.h
+time.h
+-
+stdlib.h
+-
+string.h
+-
+fuse.h
+-
+stdio.h
+-
+
+/home/samier/Desktop/School/Fall 2018/Operating-Systems/Project1/simfs/test_simfs.c
+simfs.h
+/home/samier/Desktop/School/Fall 2018/Operating-Systems/Project1/simfs/simfs.h
+stdio.h
+-
+
+/usr/include/fuse/fuse.h
+fuse_common.h
+/usr/include/fuse/fuse_common.h
+fcntl.h
+-
+time.h
+-
+utime.h
+-
+sys/types.h
+-
+sys/stat.h
+-
+sys/statvfs.h
+-
+sys/uio.h
+-
+fuse_compat.h
+/usr/include/fuse/fuse_compat.h
+
+/usr/include/fuse/fuse_common.h
+fuse_opt.h
+/usr/include/fuse/fuse_opt.h
+stdint.h
+-
+sys/types.h
+-
+fuse_common_compat.h
+/usr/include/fuse/fuse_common_compat.h
+
+/usr/include/fuse/fuse_common_compat.h
+
+/usr/include/fuse/fuse_compat.h
+sys/statfs.h
+-
+
+/usr/include/fuse/fuse_opt.h
+
