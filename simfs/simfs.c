@@ -395,15 +395,15 @@ SIMFS_ERROR simfsDeleteFile(SIMFS_NAME_TYPE fileName)
  */
 SIMFS_ERROR simfsGetFileInfo(SIMFS_NAME_TYPE fileName, SIMFS_FILE_DESCRIPTOR_TYPE *infoBuffer)
 {
-    // unsigned long hashedName = hash(fileName);
-    // SIMFS_DIR_ENT currentDirectory = simfsContext->directory[hashedName];
-    // while(currentDirectory != NULL){
-    //     if(strcmp(simfsVolume->block[currentDirectory.nodeReference].content.fileDescriptor.name,fileName) == 0){
-    //         infoBuffer = &(simfsVolume->block[currentDirectory.nodeReference].content.fileDescriptor);
-    //         return SIMFS_NO_ERROR;
-    //     }
-    //     currentDirectory = *(currentDirectory.next);
-    // }
+    unsigned long hashedName = hash(fileName);
+    SIMFS_DIR_ENT currentDirectory = simfsContext->directory[hashedName];
+    while(currentDirectory != NULL){
+        if(strcmp(simfsVolume->block[currentDirectory.nodeReference].content.fileDescriptor.name,fileName) == 0){
+            infoBuffer = &(simfsVolume->block[currentDirectory.nodeReference].content.fileDescriptor);
+            return SIMFS_NO_ERROR;
+        }
+        currentDirectory = *(currentDirectory.next);
+    }
 
     return SIMFS_NOT_FOUND_ERROR;
 }
