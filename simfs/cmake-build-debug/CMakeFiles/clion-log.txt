@@ -1,4 +1,4 @@
-/home/aj/.local/share/JetBrains/Toolbox/apps/CLion/ch-1/183.4139.25/bin/cmake/linux/bin/cmake -DCMAKE_BUILD_TYPE=Debug -G "CodeBlocks - Unix Makefiles" "/home/aj/Dropbox (CSUCI)/Teaching/Fall2018/COMP362-F18/labs/proj01/simfs"
+/home/samier/Downloads/clion-2018.3/bin/cmake/linux/bin/cmake -DCMAKE_BUILD_TYPE=Debug -G "CodeBlocks - Unix Makefiles" /home/samier/Desktop/School/Fall2018/Operating-Systems/Project1/simfs
 -- The C compiler identification is GNU 7.3.0
 -- Check for working C compiler: /usr/bin/cc
 -- Check for working C compiler: /usr/bin/cc -- works
@@ -9,4 +9,4 @@
 -- Found FUSE: /usr/include/fuse  
 -- Configuring done
 -- Generating done
--- Build files have been written to: /home/aj/Dropbox (CSUCI)/Teaching/Fall2018/COMP362-F18/labs/proj01/simfs/cmake-build-debug
+-- Build files have been written to: /home/samier/Desktop/School/Fall2018/Operating-Systems/Project1/simfs/cmake-build-debug

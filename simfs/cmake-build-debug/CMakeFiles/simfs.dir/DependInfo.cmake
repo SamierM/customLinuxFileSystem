@@ -4,8 +4,8 @@ set(CMAKE_DEPENDS_LANGUAGES
   )
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_C
-  "/home/aj/Dropbox (CSUCI)/Teaching/Fall2018/COMP362-F18/labs/proj01/simfs/simfs.c" "/home/aj/Dropbox (CSUCI)/Teaching/Fall2018/COMP362-F18/labs/proj01/simfs/cmake-build-debug/CMakeFiles/simfs.dir/simfs.c.o"
-  "/home/aj/Dropbox (CSUCI)/Teaching/Fall2018/COMP362-F18/labs/proj01/simfs/test_simfs.c" "/home/aj/Dropbox (CSUCI)/Teaching/Fall2018/COMP362-F18/labs/proj01/simfs/cmake-build-debug/CMakeFiles/simfs.dir/test_simfs.c.o"
+  "/home/samier/Desktop/School/Fall2018/Operating-Systems/Project1/simfs/simfs.c" "/home/samier/Desktop/School/Fall2018/Operating-Systems/Project1/simfs/cmake-build-debug/CMakeFiles/simfs.dir/simfs.c.o"
+  "/home/samier/Desktop/School/Fall2018/Operating-Systems/Project1/simfs/test_simfs.c" "/home/samier/Desktop/School/Fall2018/Operating-Systems/Project1/simfs/cmake-build-debug/CMakeFiles/simfs.dir/test_simfs.c.o"
   )
 set(CMAKE_C_COMPILER_ID "GNU")
 

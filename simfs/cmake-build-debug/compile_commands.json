@@ -1,12 +1,12 @@
 [
 {
-  "directory": "/home/aj/Dropbox (CSUCI)/Teaching/Fall2018/COMP362-F18/labs/proj01/simfs/cmake-build-debug",
-  "command": "/usr/bin/cc  -I/usr/include/fuse   -D_FILE_OFFSET_BITS=64 -g -Wall --pedantic -g -O0 -D_DEBUG   -std=gnu11 -o CMakeFiles/simfs.dir/test_simfs.c.o   -c \"/home/aj/Dropbox (CSUCI)/Teaching/Fall2018/COMP362-F18/labs/proj01/simfs/test_simfs.c\"",
-  "file": "/home/aj/Dropbox (CSUCI)/Teaching/Fall2018/COMP362-F18/labs/proj01/simfs/test_simfs.c"
+  "directory": "/home/samier/Desktop/School/Fall2018/Operating-Systems/Project1/simfs/cmake-build-debug",
+  "command": "/usr/bin/cc  -I/usr/include/fuse   -D_FILE_OFFSET_BITS=64 -g -Wall --pedantic -g -O0 -D_DEBUG   -std=gnu11 -o CMakeFiles/simfs.dir/test_simfs.c.o   -c /home/samier/Desktop/School/Fall2018/Operating-Systems/Project1/simfs/test_simfs.c",
+  "file": "/home/samier/Desktop/School/Fall2018/Operating-Systems/Project1/simfs/test_simfs.c"
 },
 {
-  "directory": "/home/aj/Dropbox (CSUCI)/Teaching/Fall2018/COMP362-F18/labs/proj01/simfs/cmake-build-debug",
-  "command": "/usr/bin/cc  -I/usr/include/fuse   -D_FILE_OFFSET_BITS=64 -g -Wall --pedantic -g -O0 -D_DEBUG   -std=gnu11 -o CMakeFiles/simfs.dir/simfs.c.o   -c \"/home/aj/Dropbox (CSUCI)/Teaching/Fall2018/COMP362-F18/labs/proj01/simfs/simfs.c\"",
-  "file": "/home/aj/Dropbox (CSUCI)/Teaching/Fall2018/COMP362-F18/labs/proj01/simfs/simfs.c"
+  "directory": "/home/samier/Desktop/School/Fall2018/Operating-Systems/Project1/simfs/cmake-build-debug",
+  "command": "/usr/bin/cc  -I/usr/include/fuse   -D_FILE_OFFSET_BITS=64 -g -Wall --pedantic -g -O0 -D_DEBUG   -std=gnu11 -o CMakeFiles/simfs.dir/simfs.c.o   -c /home/samier/Desktop/School/Fall2018/Operating-Systems/Project1/simfs/simfs.c",
+  "file": "/home/samier/Desktop/School/Fall2018/Operating-Systems/Project1/simfs/simfs.c"
 }
 ]

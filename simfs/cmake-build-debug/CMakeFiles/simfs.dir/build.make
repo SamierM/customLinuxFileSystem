@@ -34,19 +34,19 @@ cmake_force:
 SHELL = /bin/sh
 
 # The CMake executable.
-CMAKE_COMMAND = /home/aj/.local/share/JetBrains/Toolbox/apps/CLion/ch-1/183.4139.25/bin/cmake/linux/bin/cmake
+CMAKE_COMMAND = /home/samier/Downloads/clion-2018.3/bin/cmake/linux/bin/cmake
 
 # The command to remove a file.
-RM = /home/aj/.local/share/JetBrains/Toolbox/apps/CLion/ch-1/183.4139.25/bin/cmake/linux/bin/cmake -E remove -f
+RM = /home/samier/Downloads/clion-2018.3/bin/cmake/linux/bin/cmake -E remove -f
 
 # Escaping for special characters.
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = "/home/aj/Dropbox (CSUCI)/Teaching/Fall2018/COMP362-F18/labs/proj01/simfs"
+CMAKE_SOURCE_DIR = /home/samier/Desktop/School/Fall2018/Operating-Systems/Project1/simfs
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = "/home/aj/Dropbox (CSUCI)/Teaching/Fall2018/COMP362-F18/labs/proj01/simfs/cmake-build-debug"
+CMAKE_BINARY_DIR = /home/samier/Desktop/School/Fall2018/Operating-Systems/Project1/simfs/cmake-build-debug
 
 # Include any dependencies generated for this target.
 include CMakeFiles/simfs.dir/depend.make
@@ -59,29 +59,29 @@ include CMakeFiles/simfs.dir/flags.make
 
 CMakeFiles/simfs.dir/test_simfs.c.o: CMakeFiles/simfs.dir/flags.make
 CMakeFiles/simfs.dir/test_simfs.c.o: ../test_simfs.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir="/home/aj/Dropbox (CSUCI)/Teaching/Fall2018/COMP362-F18/labs/proj01/simfs/cmake-build-debug/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_1) "Building C object CMakeFiles/simfs.dir/test_simfs.c.o"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/simfs.dir/test_simfs.c.o   -c "/home/aj/Dropbox (CSUCI)/Teaching/Fall2018/COMP362-F18/labs/proj01/simfs/test_simfs.c"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/samier/Desktop/School/Fall2018/Operating-Systems/Project1/simfs/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building C object CMakeFiles/simfs.dir/test_simfs.c.o"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/simfs.dir/test_simfs.c.o   -c /home/samier/Desktop/School/Fall2018/Operating-Systems/Project1/simfs/test_simfs.c
 
 CMakeFiles/simfs.dir/test_simfs.c.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/simfs.dir/test_simfs.c.i"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E "/home/aj/Dropbox (CSUCI)/Teaching/Fall2018/COMP362-F18/labs/proj01/simfs/test_simfs.c" > CMakeFiles/simfs.dir/test_simfs.c.i
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/samier/Desktop/School/Fall2018/Operating-Systems/Project1/simfs/test_simfs.c > CMakeFiles/simfs.dir/test_simfs.c.i
 
 CMakeFiles/simfs.dir/test_simfs.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/simfs.dir/test_simfs.c.s"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S "/home/aj/Dropbox (CSUCI)/Teaching/Fall2018/COMP362-F18/labs/proj01/simfs/test_simfs.c" -o CMakeFiles/simfs.dir/test_simfs.c.s
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/samier/Desktop/School/Fall2018/Operating-Systems/Project1/simfs/test_simfs.c -o CMakeFiles/simfs.dir/test_simfs.c.s
 
 CMakeFiles/simfs.dir/simfs.c.o: CMakeFiles/simfs.dir/flags.make
 CMakeFiles/simfs.dir/simfs.c.o: ../simfs.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir="/home/aj/Dropbox (CSUCI)/Teaching/Fall2018/COMP362-F18/labs/proj01/simfs/cmake-build-debug/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_2) "Building C object CMakeFiles/simfs.dir/simfs.c.o"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/simfs.dir/simfs.c.o   -c "/home/aj/Dropbox (CSUCI)/Teaching/Fall2018/COMP362-F18/labs/proj01/simfs/simfs.c"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/samier/Desktop/School/Fall2018/Operating-Systems/Project1/simfs/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building C object CMakeFiles/simfs.dir/simfs.c.o"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/simfs.dir/simfs.c.o   -c /home/samier/Desktop/School/Fall2018/Operating-Systems/Project1/simfs/simfs.c
 
 CMakeFiles/simfs.dir/simfs.c.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/simfs.dir/simfs.c.i"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E "/home/aj/Dropbox (CSUCI)/Teaching/Fall2018/COMP362-F18/labs/proj01/simfs/simfs.c" > CMakeFiles/simfs.dir/simfs.c.i
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/samier/Desktop/School/Fall2018/Operating-Systems/Project1/simfs/simfs.c > CMakeFiles/simfs.dir/simfs.c.i
 
 CMakeFiles/simfs.dir/simfs.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/simfs.dir/simfs.c.s"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S "/home/aj/Dropbox (CSUCI)/Teaching/Fall2018/COMP362-F18/labs/proj01/simfs/simfs.c" -o CMakeFiles/simfs.dir/simfs.c.s
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/samier/Desktop/School/Fall2018/Operating-Systems/Project1/simfs/simfs.c -o CMakeFiles/simfs.dir/simfs.c.s
 
 # Object files for target simfs
 simfs_OBJECTS = \
@@ -96,7 +96,7 @@ bin/simfs: CMakeFiles/simfs.dir/simfs.c.o
 bin/simfs: CMakeFiles/simfs.dir/build.make
 bin/simfs: /usr/lib/x86_64-linux-gnu/libfuse.so
 bin/simfs: CMakeFiles/simfs.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir="/home/aj/Dropbox (CSUCI)/Teaching/Fall2018/COMP362-F18/labs/proj01/simfs/cmake-build-debug/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_3) "Linking C executable bin/simfs"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/samier/Desktop/School/Fall2018/Operating-Systems/Project1/simfs/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Linking C executable bin/simfs"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/simfs.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.
@@ -109,6 +109,6 @@ CMakeFiles/simfs.dir/clean:
 .PHONY : CMakeFiles/simfs.dir/clean
 
 CMakeFiles/simfs.dir/depend:
-	cd "/home/aj/Dropbox (CSUCI)/Teaching/Fall2018/COMP362-F18/labs/proj01/simfs/cmake-build-debug" && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" "/home/aj/Dropbox (CSUCI)/Teaching/Fall2018/COMP362-F18/labs/proj01/simfs" "/home/aj/Dropbox (CSUCI)/Teaching/Fall2018/COMP362-F18/labs/proj01/simfs" "/home/aj/Dropbox (CSUCI)/Teaching/Fall2018/COMP362-F18/labs/proj01/simfs/cmake-build-debug" "/home/aj/Dropbox (CSUCI)/Teaching/Fall2018/COMP362-F18/labs/proj01/simfs/cmake-build-debug" "/home/aj/Dropbox (CSUCI)/Teaching/Fall2018/COMP362-F18/labs/proj01/simfs/cmake-build-debug/CMakeFiles/simfs.dir/DependInfo.cmake" --color=$(COLOR)
+	cd /home/samier/Desktop/School/Fall2018/Operating-Systems/Project1/simfs/cmake-build-debug && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/samier/Desktop/School/Fall2018/Operating-Systems/Project1/simfs /home/samier/Desktop/School/Fall2018/Operating-Systems/Project1/simfs /home/samier/Desktop/School/Fall2018/Operating-Systems/Project1/simfs/cmake-build-debug /home/samier/Desktop/School/Fall2018/Operating-Systems/Project1/simfs/cmake-build-debug /home/samier/Desktop/School/Fall2018/Operating-Systems/Project1/simfs/cmake-build-debug/CMakeFiles/simfs.dir/DependInfo.cmake --color=$(COLOR)
 .PHONY : CMakeFiles/simfs.dir/depend
 

@@ -6,11 +6,11 @@
 
 #IncludeRegexTransform: 
 
-/home/aj/Dropbox (CSUCI)/Teaching/Fall2018/COMP362-F18/labs/proj01/simfs/simfs.c
+/home/samier/Desktop/School/Fall2018/Operating-Systems/Project1/simfs/simfs.c
 simfs.h
-/home/aj/Dropbox (CSUCI)/Teaching/Fall2018/COMP362-F18/labs/proj01/simfs/simfs.h
+/home/samier/Desktop/School/Fall2018/Operating-Systems/Project1/simfs/simfs.h
 
-/home/aj/Dropbox (CSUCI)/Teaching/Fall2018/COMP362-F18/labs/proj01/simfs/simfs.h
+/home/samier/Desktop/School/Fall2018/Operating-Systems/Project1/simfs/simfs.h
 time.h
 -
 stdlib.h
@@ -18,6 +18,10 @@ stdlib.h
 string.h
 -
 fuse.h
+-
+stdio.h
+-
+stdbool.h
 -
 
 /usr/include/fuse/fuse.h

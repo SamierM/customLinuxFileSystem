@@ -36,6 +36,23 @@ int main()
     if(simfsCreateFile("testFileForCreate", FILE_CONTENT_TYPE) != SIMFS_DUPLICATE_ERROR)
         printf("simfsCreateFile detected duplicate successfully\n");
 
+
+    ///////////////////////////////////////////////////////////
+    //testing delete file
+    if(simfsDeleteFile("fileDoesNotExist") == SIMFS_NOT_FOUND_ERROR)
+        printf("We correctly did not find the file!\n");
+    else
+        printf("Should have produced a not found error!");
+    if(simfsDeleteFile("/testFileForCreate") == SIMFS_NO_ERROR)
+        printf("Correctly deleted the test file!");
+    else
+        printf("We did not correctly delete the test file!");
+    //@TODO Access error testing and implementation
+    // Also to test deleting a non empty folder
+
+
+    ///////////////////////////////////////////////////////////
+
     if (simfsUmountFileSystem(SIMFS_FILE_NAME) != SIMFS_NO_ERROR)
         exit(EXIT_FAILURE);
 

@@ -6,6 +6,7 @@
 #include <string.h>
 #include <fuse.h>
 #include <stdio.h>
+#include <stdbool.h>
 
 //////////////////////////////////////////////////////////////////////////
 //
@@ -145,7 +146,7 @@ typedef struct simfs_dir_ent {
 //
 // slots are heads to resolution lists for conflicting names
 //
-typedef SIMFS_DIR_ENT SIMFS_DIRECTORY[SIMFS_DIRECTORY_SIZE];
+typedef SIMFS_DIR_ENT *SIMFS_DIRECTORY[SIMFS_DIRECTORY_SIZE];
 
 //
 // global open file table
@@ -231,6 +232,12 @@ void simfsFlipBit(unsigned char *bitvector, unsigned short bitIndex);
 void simfsSetBit(unsigned char *bitvector, unsigned short bitIndex);
 void simfsClearBit(unsigned char *bitvector, unsigned short bitIndex);
 unsigned short simfsFindFreeBlock(unsigned char *bitvector);
+
+
+//custom helper functions
+void hashFileSystem(SIMFS_BLOCK_TYPE currentBlock, size_t numberOfFiles);
+void addFileDescriptorToList(SIMFS_DIR_ENT *conflictResList, SIMFS_INDEX_TYPE descriptorIndex);
+bool namesAreSame(char* name1, char* name2);
 
 /*
  * The following functions can be used to simulate FUSE context's user and process identifiers for testing.

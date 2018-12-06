@@ -1,4 +1,4 @@
-# Install script for directory: /home/aj/Dropbox (CSUCI)/Teaching/Fall2018/COMP362-F18/labs/proj01/simfs
+# Install script for directory: /home/samier/Desktop/School/Fall2018/Operating-Systems/Project1/simfs
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -45,5 +45,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "/home/aj/Dropbox (CSUCI)/Teaching/Fall2018/COMP362-F18/labs/proj01/simfs/cmake-build-debug/${CMAKE_INSTALL_MANIFEST}"
+file(WRITE "/home/samier/Desktop/School/Fall2018/Operating-Systems/Project1/simfs/cmake-build-debug/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")
