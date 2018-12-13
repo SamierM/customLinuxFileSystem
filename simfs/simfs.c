@@ -5,6 +5,9 @@
 // allocation of the in-memory data structures
 //
 //////////////////////////////////////////////////////////////////////////
+//Access Rights
+// 0  Owner | Group | ALL
+//    RWE   | RWE   | RWE
 
 SIMFS_CONTEXT_TYPE *simfsContext; // all in-memory information about the system
 SIMFS_VOLUME *simfsVolume;
@@ -103,6 +106,11 @@ SIMFS_ERROR simfsCreateFileSystem(char *simfsFileName) {
     simfsVolume = malloc(sizeof(SIMFS_VOLUME));
     if (simfsVolume == NULL)
         return SIMFS_ALLOC_ERROR;
+
+    //initialize the globalOpenFileTableValues to emmpty
+    for(int i = 0; i < SIMFS_MAX_NUMBER_OF_OPEN_FILES; i++){
+        simfsContext->globalOpenFileTable[i].type = INVALID_CONTENT_TYPE; //this signals that it is empty
+    }
 
     // initialize the superblock
 
@@ -270,23 +278,23 @@ SIMFS_ERROR simfsCreateFile(SIMFS_NAME_TYPE fileName, SIMFS_CONTENT_TYPE type) {
     strcpy(simfsContext->bitvector,simfsVolume->bitvector);
     unsigned long hashedName;
     SIMFS_INDEX_TYPE currentDirectoryIndex;
-    SIMFS_BLOCK_TYPE currentDirectory;
+    SIMFS_BLOCK_TYPE *currentDirectory;
     char *nameWithPath;
 
     if (simfsContext->processControlBlocks != NULL) {
         currentDirectoryIndex = simfsContext->processControlBlocks->currentWorkingDirectory;
-        currentDirectory = simfsVolume->block[currentDirectoryIndex];
-        nameWithPath = (char*)malloc(sizeof(fileName) + sizeof(currentDirectory.content.fileDescriptor.name) + 10);
-        strcpy(nameWithPath, currentDirectory.content.fileDescriptor.name);
+        currentDirectory = &(simfsVolume->block[currentDirectoryIndex]);
+        nameWithPath = (char*)malloc(sizeof(fileName) + sizeof(currentDirectory->content.fileDescriptor.name) + 10);
+        strcpy(nameWithPath, currentDirectory->content.fileDescriptor.name);
     } else {
         nameWithPath = (char*)malloc(sizeof(fileName) + 10);
-        currentDirectory = simfsVolume->block[0]; //root directory
+        currentDirectory = &(simfsVolume->block[0]); //root directory
     }
     strcat(nameWithPath, "/");
     strcat(nameWithPath, fileName); //creates filename with path prepended
 
     hashedName = hash(nameWithPath);
-    size_t numberOfFilesInDirectory = currentDirectory.content.fileDescriptor.size;
+    size_t numberOfFilesInDirectory = currentDirectory->content.fileDescriptor.size;
     SIMFS_INDEX_TYPE *indexedFiles;
 
     SIMFS_DIR_ENT *headOfCollisionList = simfsContext->directory[hashedName];
@@ -298,17 +306,6 @@ SIMFS_ERROR simfsCreateFile(SIMFS_NAME_TYPE fileName, SIMFS_CONTENT_TYPE type) {
         headOfCollisionList = headOfCollisionList->next;
     }
 
-//    if(numberOfFilesInDirectory > 0){
-//        indexedFiles = simfsVolume->block[currentDirectory.content.fileDescriptor.block_ref].content.index;
-//
-//        for(int i = 0; i < numberOfFilesInDirectory; i++){
-//            SIMFS_BLOCK_TYPE currentFileToCheck = simfsVolume->block[indexedFiles[i]];
-//            char *nameToCheck = currentFileToCheck.content.fileDescriptor.name;
-//            if(namesAreSame(nameToCheck,nameWithPath)){
-//                return SIMFS_DUPLICATE_ERROR;
-//            }
-//        }
-//    }
 
     SIMFS_FILE_DESCRIPTOR_TYPE *descriptorBuffer = (SIMFS_FILE_DESCRIPTOR_TYPE *) malloc(
             sizeof(SIMFS_FILE_DESCRIPTOR_TYPE));
@@ -384,6 +381,7 @@ SIMFS_ERROR simfsCreateFile(SIMFS_NAME_TYPE fileName, SIMFS_CONTENT_TYPE type) {
  *          - copies the in-memory bitvector to the bitvector blocks on the simulated disk
  */
 SIMFS_ERROR simfsDeleteFile(SIMFS_NAME_TYPE fileName) {
+    strcpy(simfsContext->bitvector,simfsVolume->bitvector);
     unsigned long hashedName = hash(fileName);
     SIMFS_DIR_ENT *listElement = simfsContext->directory[hashedName];
     SIMFS_DIR_ENT *prevListElement = listElement;
@@ -413,47 +411,6 @@ SIMFS_ERROR simfsDeleteFile(SIMFS_NAME_TYPE fileName) {
     simfsFlipBit(simfsContext->bitvector, listElement->nodeReference);
     strcpy(simfsVolume->bitvector, simfsContext->bitvector);
     return SIMFS_NO_ERROR;
-
-    //SIMFS_INDEX_TYPE currentDirectoryIndex = simfsContext->processControlBlocks->currentWorkingDirectory;
-//    SIMFS_BLOCK_TYPE currentDirectory = simfsVolume->block[simfs];
-//    size_t numberOfFilesInDirectory = currentDirectory.content.fileDescriptor.size;
-//    SIMFS_INDEX_TYPE *indexedFiles;
-//
-//    char *nameWithPath;
-//    strcpy(nameWithPath, currentDirectory.content.fileDescriptor.name);
-//    strcat(nameWithPath, fileName); //creates filename with path prepended
-//
-//    if (numberOfFilesInDirectory == 0)
-//        return SIMFS_NOT_FOUND_ERROR;
-//
-//    indexedFiles = simfsVolume->block[currentDirectory.content.fileDescriptor.block_ref].content.index;
-//    for (int i = 0; i <= numberOfFilesInDirectory; i++) {
-//        if (i == numberOfFilesInDirectory) {
-//            return SIMFS_NOT_FOUND_ERROR;
-//        }
-//        SIMFS_BLOCK_TYPE currentFileToCheck = simfsVolume->block[indexedFiles[i]];
-//        char *nameToCheck = currentFileToCheck.content.fileDescriptor.name;
-//        if (namesAreSame(nameToCheck, nameWithPath)) {
-//            if ((mask & currentFileToCheck.content.fileDescriptor.accessRights) != mask)
-//                return SIMFS_ACCESS_ERROR;
-//            if (currentFileToCheck.content.fileDescriptor.type == FOLDER_CONTENT_TYPE &&
-//                currentFileToCheck.content.fileDescriptor.size > 0) {
-//                return SIMFS_NOT_EMPTY_ERROR;
-//            } else { //this is the case where we have an empty folder or a file that we have permission to delete
-//                simfsFlipBit(simfsContext->bitvector, indexedFiles[i]); //flip the bit to the node reference
-//                simfsFlipBit(simfsContext->bitvector,
-//                             currentFileToCheck.content.fileDescriptor.block_ref); //flip bit to the reference node;
-//
-//                //flip bit for each item if the data takes more than one item
-//                numberOfFilesInDirectory = currentFileToCheck.content.fileDescriptor.size;
-//                currentFileToCheck = simfsVolume->block[currentFileToCheck.content.fileDescriptor.block_ref];
-//                for (int i = 0; i < numberOfFilesInDirectory; i++) {
-//                    simfsFlipBit(simfsContext->bitvector, currentFileToCheck.content.index[i]);
-//                }
-//            }
-//        }
-//    }
-
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -510,11 +467,167 @@ SIMFS_ERROR simfsGetFileInfo(SIMFS_NAME_TYPE fileName, SIMFS_FILE_DESCRIPTOR_TYP
  * file table, or if there is any other allocation problem, then the function returns SIMFS_ALLOC_ERROR.
  *
  */
+//Access Rights
+// 0  Owner | Group | ALL
+//    RWE   | RWE   | RWE
 SIMFS_ERROR simfsOpenFile(SIMFS_NAME_TYPE fileName, SIMFS_FILE_HANDLE_TYPE *fileHandle) {
-    // TODO: implement
+    //Simulate FUSE processes
+    struct fuse_context *context = malloc(sizeof(struct fuse_context));
+    context->pid = 1;
+    context->uid = 1;
+    //
 
+    strcpy(simfsContext->bitvector,simfsVolume->bitvector);
+    unsigned long hashedName = hash(fileName);
+    SIMFS_DIR_ENT *listElement = simfsContext->directory[hashedName];
+    SIMFS_FILE_DESCRIPTOR_TYPE matchedDescriptor;
+    SIMFS_BLOCK_TYPE potentialMatch;
+    while(listElement != NULL){
+        potentialMatch = simfsVolume->block[listElement->nodeReference];
+        if((potentialMatch.type == FILE_CONTENT_TYPE || potentialMatch.type == FOLDER_CONTENT_TYPE) &&
+           namesAreSame(fileName,potentialMatch.content.fileDescriptor.name)){
+            matchedDescriptor = potentialMatch.content.fileDescriptor;
+            break;
+        }
+        listElement = listElement->next;
+    }
+    if(listElement == NULL)
+        return SIMFS_NOT_FOUND_ERROR;
+
+    //check to see if our current process exists
+    SIMFS_PROCESS_CONTROL_BLOCK_TYPE *processBlockEntry = simfsContext->processControlBlocks;
+    SIMFS_OPEN_FILE_GLOBAL_TABLE_TYPE *globalEntry;
+    int placeHolder = -1;
+    bool foundProcessInList = false;
+
+    while( processBlockEntry != NULL){
+        if(processBlockEntry->pid == context->pid){
+            foundProcessInList = true;
+            break;
+        }
+    }
+    if(!foundProcessInList){
+        processBlockEntry = createProcessEntry(context);
+    }
+    //Search for file table entry
+    if((placeHolder = currentProcessHasFile(processBlockEntry,fileName)) >= 0)
+        return SIMFS_DUPLICATE_ERROR;
+    else{
+        globalEntry = getGlobalEntry(fileName);
+        if(globalEntry != NULL){ //if there exists an entry
+            globalEntry->referenceCount++;
+        }
+        else{ //if there is not an entry, create one
+            globalEntry = createGlobalFileTableEntry(fileName,listElement->nodeReference);
+            if(assignGlobalEntry(globalEntry) == SIMFS_ALLOC_ERROR ||
+            assignProcessTableEntryIndex(globalEntry,processBlockEntry) == SIMFS_ALLOC_ERROR)
+                return SIMFS_ALLOC_ERROR;
+        }
+        if(placeHolder >= 0) *fileHandle = placeHolder;
+    }
     return SIMFS_NO_ERROR;
 }
+
+SIMFS_OPEN_FILE_GLOBAL_TABLE_TYPE* getGlobalEntry(char* fileName){
+    SIMFS_OPEN_FILE_GLOBAL_TABLE_TYPE* globalEntry = NULL;
+    SIMFS_FILE_DESCRIPTOR_TYPE fileDescriptor;
+    for(int i = 0; i < SIMFS_MAX_NUMBER_OF_OPEN_FILES; i++){
+        fileDescriptor =simfsVolume->block[simfsContext->globalOpenFileTable[i].fileDescriptor].content.fileDescriptor;
+        if(namesAreSame(fileName, fileDescriptor.name)){
+            globalEntry = (SIMFS_OPEN_FILE_GLOBAL_TABLE_TYPE*)malloc(sizeof(SIMFS_OPEN_FILE_GLOBAL_TABLE_TYPE));
+            globalEntry->fileDescriptor = simfsContext->globalOpenFileTable[i].fileDescriptor;
+            globalEntry->referenceCount = 0;
+            globalEntry->type = fileDescriptor.type;
+            globalEntry->accessRights = fileDescriptor.accessRights;
+            globalEntry->size = fileDescriptor.size;
+            globalEntry->creationTime = fileDescriptor.creationTime;
+            globalEntry->lastAccessTime = fileDescriptor.lastAccessTime;
+            globalEntry->lastModificationTime = fileDescriptor.lastModificationTime;
+            globalEntry->owner = fileDescriptor.owner;
+        }
+    }
+
+    return globalEntry;
+}
+
+int currentProcessHasFile(SIMFS_PROCESS_CONTROL_BLOCK_TYPE *processBlockEntry,char *fileName){
+    for(int i = 0; i < SIMFS_MAX_NUMBER_OF_OPEN_FILES_PER_PROCESS; i++){
+        if(namesAreSame(simfsVolume->block[processBlockEntry->openFileTable[i].globalEntry->fileDescriptor].content
+        .fileDescriptor.name,fileName)){
+            return i;
+        }
+    }
+
+    return -1;
+}
+
+SIMFS_OPEN_FILE_GLOBAL_TABLE_TYPE* createGlobalFileTableEntry(char* fileName, SIMFS_INDEX_TYPE index){
+	
+    SIMFS_OPEN_FILE_GLOBAL_TABLE_TYPE *globalEntry = (SIMFS_OPEN_FILE_GLOBAL_TABLE_TYPE *)malloc(sizeof(fileName));
+    SIMFS_FILE_DESCRIPTOR_TYPE *fileDescriptor = (SIMFS_FILE_DESCRIPTOR_TYPE*)malloc(sizeof(SIMFS_FILE_DESCRIPTOR_TYPE));
+    simfsGetFileInfo(fileName,fileDescriptor);
+    globalEntry->referenceCount = 0;
+    globalEntry->type = fileDescriptor->type;
+    globalEntry->accessRights = fileDescriptor->accessRights;
+    globalEntry->size = fileDescriptor->size;
+    globalEntry->creationTime = fileDescriptor->creationTime;
+    globalEntry->lastAccessTime = fileDescriptor->lastAccessTime;
+    globalEntry->lastModificationTime = fileDescriptor->lastModificationTime;
+    globalEntry->owner = fileDescriptor->owner;
+    globalEntry->fileDescriptor = index;
+
+    return globalEntry;
+}
+
+SIMFS_PROCESS_CONTROL_BLOCK_TYPE* createProcessEntry(struct fuse_context *context){
+    SIMFS_PROCESS_CONTROL_BLOCK_TYPE *processControlBlock = simfsContext->processControlBlocks;
+    SIMFS_PROCESS_CONTROL_BLOCK_TYPE * prevBlock = processControlBlock;
+    while(processControlBlock != NULL){
+        if(processControlBlock->pid == context->pid)
+            return processControlBlock;
+        else{
+            prevBlock = processControlBlock;
+            processControlBlock = processControlBlock->next;
+        }
+    }
+    processControlBlock = (SIMFS_PROCESS_CONTROL_BLOCK_TYPE*)malloc(sizeof(SIMFS_PROCESS_CONTROL_BLOCK_TYPE));
+    processControlBlock->next = NULL;
+    processControlBlock->pid = context->pid;
+    processControlBlock->numberOfOpenFiles = 0;
+    processControlBlock->currentWorkingDirectory = 0;
+    if(simfsContext->processControlBlocks == NULL){
+        simfsContext->processControlBlocks = processControlBlock;
+    }
+    else{
+        prevBlock->next = processControlBlock;
+    }
+    return processControlBlock;
+}
+
+SIMFS_ERROR assignProcessTableEntryIndex(SIMFS_OPEN_FILE_GLOBAL_TABLE_TYPE *globalEntry,
+        SIMFS_PROCESS_CONTROL_BLOCK_TYPE *processBlockEntry){
+    for(int i = 0; i < SIMFS_MAX_NUMBER_OF_OPEN_FILES_PER_PROCESS; i++){
+        if(processBlockEntry->openFileTable[i].globalEntry == NULL) {
+            processBlockEntry->openFileTable[i].globalEntry = globalEntry;
+            return SIMFS_NO_ERROR;
+        }
+    }
+
+    return SIMFS_ALLOC_ERROR;
+}
+
+SIMFS_ERROR assignGlobalEntry(SIMFS_OPEN_FILE_GLOBAL_TABLE_TYPE *globalEntry){
+
+    for(int i = 0; i < SIMFS_MAX_NUMBER_OF_OPEN_FILES; i++){
+        if(simfsContext->globalOpenFileTable[i].type ==INVALID_CONTENT_TYPE){
+            simfsContext->globalOpenFileTable[i] = *globalEntry;
+            return SIMFS_NO_ERROR;
+        }
+    }
+
+    return SIMFS_ALLOC_ERROR;
+}
+
 
 //////////////////////////////////////////////////////////////////////////
 
@@ -545,9 +658,87 @@ SIMFS_ERROR simfsOpenFile(SIMFS_NAME_TYPE fileName, SIMFS_FILE_HANDLE_TYPE *file
  *
  */
 SIMFS_ERROR simfsWriteFile(SIMFS_FILE_HANDLE_TYPE fileHandle, char *writeBuffer) {
-    // TODO: implement
+    SIMFS_OPEN_FILE_GLOBAL_TABLE_TYPE *foundFile = &(simfsContext->globalOpenFileTable[fileHandle]);
+    unsigned short writeRightAccessMask = 0200;
 
+    if(foundFile == NULL || foundFile->type == INVALID_CONTENT_TYPE)
+        return SIMFS_NOT_FOUND_ERROR;
+    else if((foundFile->accessRights & writeRightAccessMask) != writeRightAccessMask){
+        return SIMFS_ACCESS_ERROR;
+    }
+    int numberOfBlocksNeeded = sizeof(writeBuffer)/SIMFS_BLOCK_SIZE;
+    if(sizeof(writeBuffer)%SIMFS_BLOCK_SIZE > 0 || numberOfBlocksNeeded == 0)
+        numberOfBlocksNeeded++;
+    if(!validNumberOfBlocksExist(numberOfBlocksNeeded))
+        return SIMFS_ALLOC_ERROR;
+
+    SIMFS_FILE_DESCRIPTOR_TYPE writeToFileDescriptor = simfsVolume->block[foundFile->fileDescriptor].content.fileDescriptor;
+   if(simfsVolume->block[writeToFileDescriptor.block_ref].type == INDEX_CONTENT_TYPE){
+        for(int i = 0; i < SIMFS_INDEX_SIZE;i++){
+            simfsFlipBit(simfsContext->bitvector,simfsVolume->block[writeToFileDescriptor.block_ref].content.index[i]);
+        }
+    }
+
+   //copy data
+    int freeBitIndex;
+    SIMFS_BLOCK_TYPE referenceBlock;
+    //simfsFlipBit(simfsContext->bitvector,writeToFileDescriptor.block_ref);
+    if(numberOfBlocksNeeded == 1){
+        freeBitIndex = simfsFindFreeBlock(simfsContext->bitvector);
+        referenceBlock = simfsVolume->block[freeBitIndex];
+        referenceBlock.type = DATA_CONTENT_TYPE;
+        for(int i = 0; i < sizeof(writeBuffer); i++){
+            referenceBlock.content.data[i] = writeBuffer[i];
+        }
+    }
+    else{
+        int indexOfWriteBuffer = 0;
+        freeBitIndex = simfsFindFreeBlock(simfsContext->bitvector);
+        referenceBlock = simfsVolume->block[freeBitIndex];
+        referenceBlock.type = INDEX_CONTENT_TYPE;
+        do {
+            for (int i = 0; i < SIMFS_INDEX_SIZE - 1 && indexOfWriteBuffer < sizeof(writeBuffer)-1; i++) {
+                referenceBlock.content.index[i] = simfsFindFreeBlock(simfsContext);
+                simfsFlipBit(simfsContext->bitvector,referenceBlock.content.index[i]);
+                simfsVolume->block[referenceBlock.content.index[i]].type = DATA_CONTENT_TYPE;
+                for (int j = 0; j < SIMFS_DATA_SIZE && indexOfWriteBuffer < sizeof(writeBuffer)-1; j++) {
+                    simfsVolume->block[referenceBlock.content.index[i]].content.data[j] = writeBuffer[indexOfWriteBuffer++];
+                }
+            }
+            freeBitIndex = simfsFindFreeBlock(simfsContext->bitvector);
+            simfsFlipBit(simfsContext->bitvector,freeBitIndex);
+            referenceBlock = simfsVolume->block[freeBitIndex];
+            referenceBlock.type = INDEX_CONTENT_TYPE;
+        }while(indexOfWriteBuffer < sizeof(writeBuffer));
+    }
+    writeToFileDescriptor.size = sizeof(writeBuffer);
+    writeToFileDescriptor.lastAccessTime = time(0);
+    writeToFileDescriptor.lastModificationTime = writeToFileDescriptor.lastAccessTime;
+
+    strcpy(simfsVolume->bitvector, simfsContext->bitvector);
     return SIMFS_NO_ERROR;
+}
+
+bool validNumberOfBlocksExist(int numberOfBlocksNeeded){
+	char currentByteOfBitvector;
+	unsigned char fullMask = 0xFF;
+	
+    for(int i = 0; i < SIMFS_NUMBER_OF_BLOCKS/8; i++){
+		currentByteOfBitvector = simfsContext->bitvector[i];
+		unsigned char bitMask = 0x80;
+		if(currentByteOfBitvector != fullMask){
+			for(int j = 0; j < 8 && numberOfBlocksNeeded > 0; j++){
+				if(!(currentByteOfBitvector & bitMask)){
+					numberOfBlocksNeeded--;
+				}
+				mask>>=1;
+			}
+		}
+		if(numberOfBlocksNeeded == 0)
+			return true;
+    }
+    return false;
+    }
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -571,8 +762,37 @@ SIMFS_ERROR simfsWriteFile(SIMFS_FILE_HANDLE_TYPE fileHandle, char *writeBuffer)
  *
  */
 SIMFS_ERROR simfsReadFile(SIMFS_FILE_HANDLE_TYPE fileHandle, char **readBuffer) {
-    // TODO: implement
+    SIMFS_OPEN_FILE_GLOBAL_TABLE_TYPE *foundFile = &(simfsContext->globalOpenFileTable[fileHandle]);
+    unsigned short readRightAccessMask = 0800;
 
+    if(foundFile == NULL || foundFile->type == INVALID_CONTENT_TYPE)
+        return SIMFS_NOT_FOUND_ERROR;
+    else if((foundFile->accessRights & writeRightAccessMask) != readRightAccessMask){
+        return SIMFS_ACCESS_ERROR;
+    }
+	int bufferLength = foundFile->size + 1
+	(*readBuffer) = (char*) malloc(bufferLength); //add one for the EOL char
+	
+	int currentReadIndex = 0;
+	SIMFS_FILE_DESCRIPTOR_TYPE readFileDescriptor = simfsVolume->block[foundFile->fileDescriptor];
+	SIMFS_DATA_TYPE *currentDataBlock;
+	SIMFS_INDEX_TYPE *currentIndexBlock;
+	if(bufferLength  > SIMFS_BLOCK_SIZE){
+		currentIndexBlock = simfsVolume->block[readFileDescriptor.block_ref];
+		do{
+			for(int i = 0; i < SIMFS_INDEX_SIZE - 1 && currentReadIndex < bufferLength; i++){
+				currentDataBlock = currentIndexBlock[i];
+				for(int j = 0; i < SIMFS_DATA_SIZE; j++){
+					(*readBuffer)[currentReadIndex++] = currentDataBlock[j];
+				}
+			}
+			currentIndexBlock = currentIndexBlock[SIMFS_INDEX_SIZE - 1];
+		}while(currentReadIndex < bufferLength);
+		(*readBuffer)[currentReadIndex] = '\0';
+	}
+	else{
+	}
+	readFileDescriptor.lastAccessTime = time(0);
     return SIMFS_NO_ERROR;
 }
 
@@ -589,7 +809,29 @@ SIMFS_ERROR simfsReadFile(SIMFS_FILE_HANDLE_TYPE fileHandle, char **readBuffer) 
  */
 
 SIMFS_ERROR simfsCloseFile(SIMFS_FILE_HANDLE_TYPE fileHandle) {
-    // TODO: implement
+    struct fuse_context *currentContext = simfs_debug_get_context();
+    SIMFS_OPEN_FILE_GLOBAL_TABLE_TYPE *globalFileTableRef;
+    SIMFS_PROCESS_CONTROL_BLOCK_TYPE *currentProcessBlock = simfsContext->processControlBlocks;
+    SIMFS_PROCESS_CONTROL_BLOCK_TYPE *prevProcessBlock = currentProcessBlock;
+    SIMFS_PER_PROCESS_OPEN_FILE_TYPE *globalReference;
+
+    //remove entry for file from the open file table
+    while(currentProcessBlock != NULL){
+        if(currentProcessBlock->pid == currentContext->pid){
+            if(--currentProcessBlock->numberOfOpenFiles == 0){ //deletes from process list if process has no other files
+                prevProcessBlock->next = currentProcessBlock->next;
+                currentProcessBlock->next = NULL;
+            }
+            globalReference = &(currentProcessBlock->openFileTable[fileHandle]);
+            if(--globalReference->globalEntry->referenceCount == 0){
+                globalReference->globalEntry->type = INVALID_CONTENT_TYPE;
+            }
+            break;
+        }
+        prevProcessBlock = currentProcessBlock;
+        currentProcessBlock = currentProcessBlock->next;
+    }
+
 
     return SIMFS_NO_ERROR;
 }
@@ -621,7 +863,7 @@ struct fuse_context *simfs_debug_get_context() {
     context->umask = S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH; // can be changed as needed
 
     return context;
-}
+} FUSE_CONTEXT;
 
 char *simfsGenerateContent(int size) {
     size = (size <= 0 ? rand() % 1000 : size); // arbitrarily chosen as an example

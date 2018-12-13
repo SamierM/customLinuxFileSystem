@@ -13,6 +13,9 @@
 // defines for the volume
 //
 //////////////////////////////////////////////////////////////////////////
+//Access Rights
+// 0  Owner | Group | ALL
+//    RWE   | RWE   | RWE
 
 #define SIMFS_BLOCK_SIZE 16
 #define SIMFS_NUMBER_OF_BLOCKS 4096 // 2^16
@@ -102,7 +105,7 @@ typedef struct simfs_node_type {
     SIMFS_CONTENT_TYPE type;
     union { // content depends on the type
         SIMFS_FILE_DESCRIPTOR_TYPE fileDescriptor; // for directories and files
-        SIMFS_DATA_TYPE data[SIMFS_DATA_SIZE]; // for data
+        SIMFS_DATA_TYPE data; // for data
         SIMFS_INDEX_TYPE index[SIMFS_INDEX_SIZE];  // for indices; all indices but the last point to data blocks
         // the last points to another index block
     } content;
@@ -238,6 +241,14 @@ unsigned short simfsFindFreeBlock(unsigned char *bitvector);
 void hashFileSystem(SIMFS_BLOCK_TYPE currentBlock, size_t numberOfFiles);
 void addFileDescriptorToList(SIMFS_DIR_ENT *conflictResList, SIMFS_INDEX_TYPE descriptorIndex);
 bool namesAreSame(char* name1, char* name2);
+SIMFS_OPEN_FILE_GLOBAL_TABLE_TYPE* getGlobalEntry(char* fileName);
+int currentProcessHasFile(SIMFS_PROCESS_CONTROL_BLOCK_TYPE *processBlockEntry,char *fileName);
+SIMFS_OPEN_FILE_GLOBAL_TABLE_TYPE* createGlobalFileTableEntry(char* fileName, SIMFS_INDEX_TYPE index);
+SIMFS_PROCESS_CONTROL_BLOCK_TYPE* createProcessEntry(struct fuse_context *context);
+SIMFS_ERROR assignProcessTableEntryIndex(SIMFS_OPEN_FILE_GLOBAL_TABLE_TYPE *globalEntry,SIMFS_PROCESS_CONTROL_BLOCK_TYPE
+*processBlockEntry);
+SIMFS_ERROR assignGlobalEntry(SIMFS_OPEN_FILE_GLOBAL_TABLE_TYPE *globalEntry);
+bool validNumberOfBlocksExist(int numberOfBlocksNeeded);
 
 /*
  * The following functions can be used to simulate FUSE context's user and process identifiers for testing.
