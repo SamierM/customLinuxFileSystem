@@ -12,13 +12,6 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="44f4c293-e233-41e7-b67a-98bd67bed5e4" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmake-build-debug/CMakeCache.txt" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-debug/CMakeCache.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmake-build-debug/CMakeFiles/Makefile.cmake" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-debug/CMakeFiles/Makefile.cmake" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmake-build-debug/CMakeFiles/Makefile2" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-debug/CMakeFiles/Makefile2" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmake-build-debug/CMakeFiles/clion-log.txt" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-debug/CMakeFiles/clion-log.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmake-build-debug/CMakeFiles/simfs.dir/build.make" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-debug/CMakeFiles/simfs.dir/build.make" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmake-build-debug/Makefile" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-debug/Makefile" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/simfs.c" beforeDir="false" afterPath="$PROJECT_DIR$/simfs.c" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/cmake-build-debug/" />
@@ -36,8 +29,8 @@
           <file pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/simfs.c">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="891">
-                  <caret line="771" column="18" selection-start-line="771" selection-start-column="17" selection-end-line="771" selection-end-column="18" />
+                <state relative-caret-position="779">
+                  <caret line="659" column="4" selection-start-line="659" selection-start-column="4" selection-end-line="659" selection-end-column="4" />
                 </state>
               </provider>
             </entry>
@@ -70,8 +63,8 @@
           <file pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/simfs.h">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="767">
-                  <caret line="192" column="37" selection-start-line="192" selection-start-column="4" selection-end-line="192" selection-end-column="37" />
+                <state relative-caret-position="577">
+                  <caret line="182" column="8" selection-start-line="182" selection-start-column="8" selection-end-line="182" selection-end-column="8" />
                 </state>
               </provider>
             </entry>
@@ -200,12 +193,12 @@
       <workItem from="1540534296804" duration="1744000" />
       <workItem from="1543961953695" duration="1993000" />
       <workItem from="1543970148648" duration="29811000" />
-      <workItem from="1544663444666" duration="3621000" />
+      <workItem from="1544663444666" duration="4297000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="69145000" />
+    <option name="totallyTimeSpent" value="69821000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="0" width="2560" height="1410" extended-state="6" />
@@ -306,15 +299,15 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/simfs.h">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="767">
-          <caret line="192" column="37" selection-start-line="192" selection-start-column="4" selection-end-line="192" selection-end-column="37" />
+        <state relative-caret-position="577">
+          <caret line="182" column="8" selection-start-line="182" selection-start-column="8" selection-end-line="182" selection-end-column="8" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/simfs.c">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="891">
-          <caret line="771" column="18" selection-start-line="771" selection-start-column="17" selection-end-line="771" selection-end-column="18" />
+        <state relative-caret-position="779">
+          <caret line="659" column="4" selection-start-line="659" selection-start-column="4" selection-end-line="659" selection-end-column="4" />
         </state>
       </provider>
     </entry>
