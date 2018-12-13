@@ -656,8 +656,7 @@ SIMFS_PROCESS_CONTROL_BLOCK_TYPE* createProcessEntry(struct fuse_context *contex
 }
 
 SIMFS_ERROR assignProcessTableEntryIndex(SIMFS_OPEN_FILE_GLOBAL_TABLE_TYPE *globalEntry,
-        SIMFS_PROCESS_CONTROL_BLOCK_TYPE
-*processBlockEntry){
+        SIMFS_PROCESS_CONTROL_BLOCK_TYPE *processBlockEntry){
     for(int i = 0; i < SIMFS_MAX_NUMBER_OF_OPEN_FILES_PER_PROCESS; i++){
         if(processBlockEntry->openFileTable[i].globalEntry == NULL) {
             processBlockEntry->openFileTable[i].globalEntry = globalEntry;
@@ -754,7 +753,28 @@ SIMFS_ERROR simfsReadFile(SIMFS_FILE_HANDLE_TYPE fileHandle, char **readBuffer) 
  */
 
 SIMFS_ERROR simfsCloseFile(SIMFS_FILE_HANDLE_TYPE fileHandle) {
-    // TODO: implement
+    struct fuse_context *currentContext = simfs_debug_get_context();
+    SIMFS_OPEN_FILE_GLOBAL_TABLE_TYPE *globalFileTableRef;
+    SIMFS_PROCESS_CONTROL_BLOCK_TYPE *currentProcessBlock = simfsContext->processControlBlocks;
+    SIMFS_PROCESS_CONTROL_BLOCK_TYPE *prevProcessBlock = currentProcessBlock;
+    SIMFS_PER_PROCESS_OPEN_FILE_TYPE *globalReference;
+
+    //remove entry for file from the open file table
+    while(currentProcessBlock != NULL){
+        if(currentProcessBlock->pid == currentContext->pid){
+            if(--currentProcessBlock->numberOfOpenFiles == 0){ //deletes from process list if process has no other files
+                prevProcessBlock->next = currentProcessBlock->next;
+            }
+            globalReference = &(currentProcessBlock->openFileTable[fileHandle]);
+            if(--globalReference->globalEntry->referenceCount == 0){
+                globalReference->globalEntry->type = INVALID_CONTENT_TYPE;
+            }
+            break;
+        }
+        prevProcessBlock = currentProcessBlock;
+        currentProcessBlock = currentProcessBlock->next;
+    }
+
 
     return SIMFS_NO_ERROR;
 }
