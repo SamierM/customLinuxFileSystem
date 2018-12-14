@@ -1,0 +1,4 @@
+/home/samier/.local/share/Trash/files/clion-2018.3/bin/cmake/linux/bin/cmake -DCMAKE_BUILD_TYPE=Debug -G "CodeBlocks - Unix Makefiles" /home/samier/Desktop/School/Fall2018/Operating-Systems/Project1/simfs
+-- Configuring done
+-- Generating done
+-- Build files have been written to: /home/samier/Desktop/School/Fall2018/Operating-Systems/Project1/simfs/cmake-build-debug

@@ -1,0 +1,32 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/samier/Desktop/School/Fall2018/Operating-Systems/Project1/simfs/simfs.c
+simfs.h
+/home/samier/Desktop/School/Fall2018/Operating-Systems/Project1/simfs/simfs.h
+
+/home/samier/Desktop/School/Fall2018/Operating-Systems/Project1/simfs/simfs.h
+time.h
+-
+stdlib.h
+-
+string.h
+-
+fuse.h
+-
+stdio.h
+-
+stdbool.h
+-
+
+/home/samier/Desktop/School/Fall2018/Operating-Systems/Project1/simfs/test_simfs.c
+simfs.h
+/home/samier/Desktop/School/Fall2018/Operating-Systems/Project1/simfs/simfs.h
+stdio.h
+-
+

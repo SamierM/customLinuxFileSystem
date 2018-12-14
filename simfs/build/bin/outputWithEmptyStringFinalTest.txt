@@ -1,0 +1,25 @@
+testFileForCreate created successfully!
+simfsCreateFile detected duplicate successfully
+
+
+
+Expected: testFileForCreate !got: 
+Expected: FILE_CONTENT_TYPE/1 got: 0
+
+
+
+
+Correctly could not open the file!
+Correctly opened test file with file handle: 
+
+
+
+Made it through write file and should print the following in read file: 
+Please print
+We should get Please print got Please print
+
+
+We correctly did not find the file!
+Correctly deleted the test file!
+
+

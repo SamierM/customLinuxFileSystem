@@ -1,3 +1,8 @@
+/**
+* Name: Samier Mahagna
+* Project 1
+* Date: 11/13/18
+**/
 #include "simfs.h"
 
 //////////////////////////////////////////////////////////////////////////
@@ -183,6 +188,11 @@ SIMFS_ERROR simfsMountFileSystem(char *simfsFileName) {
         simfsContext->directory[i] = NULL;
     }
 
+    //initialize the globalOpenFileTableValues to emmpty
+    for(int i = 0; i < SIMFS_MAX_NUMBER_OF_OPEN_FILES; i++){
+        simfsContext->globalOpenFileTable[i].type = INVALID_CONTENT_TYPE; //this signals that it is empty
+    }
+
     if (simfsContext == NULL)
         return SIMFS_ALLOC_ERROR;
 
@@ -321,7 +331,7 @@ SIMFS_ERROR simfsCreateFile(SIMFS_NAME_TYPE fileName, SIMFS_CONTENT_TYPE type) {
     descriptorBuffer->accessRights = allAccessRights;
     strcpy(descriptorBuffer->name, nameWithPath);
     descriptorBuffer->type = type;
-    currentDirectory.content.fileDescriptor.size++;
+    currentDirectory->content.fileDescriptor.size++;
 
     unsigned short freeBitIndex = simfsFindFreeBlock(simfsContext->bitvector);
     simfsFlipBit(simfsContext->bitvector, freeBitIndex);
@@ -387,7 +397,6 @@ SIMFS_ERROR simfsDeleteFile(SIMFS_NAME_TYPE fileName) {
     SIMFS_DIR_ENT *prevListElement = listElement;
     SIMFS_FILE_DESCRIPTOR_TYPE matchedDescriptor;
     SIMFS_BLOCK_TYPE potentialMatch;
-    //size_t numberOfFilesToCheck =
 
     while(listElement != NULL){
         potentialMatch = simfsVolume->block[listElement->nodeReference];
@@ -552,7 +561,8 @@ SIMFS_OPEN_FILE_GLOBAL_TABLE_TYPE* getGlobalEntry(char* fileName){
 
 int currentProcessHasFile(SIMFS_PROCESS_CONTROL_BLOCK_TYPE *processBlockEntry,char *fileName){
     for(int i = 0; i < SIMFS_MAX_NUMBER_OF_OPEN_FILES_PER_PROCESS; i++){
-        if(namesAreSame(simfsVolume->block[processBlockEntry->openFileTable[i].globalEntry->fileDescriptor].content
+        if(processBlockEntry->openFileTable[i].globalEntry != NULL && namesAreSame
+        (simfsVolume->block[processBlockEntry->openFileTable[i].globalEntry->fileDescriptor].content
         .fileDescriptor.name,fileName)){
             return i;
         }
@@ -563,17 +573,18 @@ int currentProcessHasFile(SIMFS_PROCESS_CONTROL_BLOCK_TYPE *processBlockEntry,ch
 
 SIMFS_OPEN_FILE_GLOBAL_TABLE_TYPE* createGlobalFileTableEntry(char* fileName, SIMFS_INDEX_TYPE index){
 
-    SIMFS_OPEN_FILE_GLOBAL_TABLE_TYPE *globalEntry = (SIMFS_OPEN_FILE_GLOBAL_TABLE_TYPE *)malloc(sizeof(fileName));
-    SIMFS_FILE_DESCRIPTOR_TYPE *fileDescriptor = (SIMFS_FILE_DESCRIPTOR_TYPE*)malloc(sizeof(SIMFS_FILE_DESCRIPTOR_TYPE));
-    simfsGetFileInfo(fileName,fileDescriptor);
-    globalEntry->referenceCount = 0;
-    globalEntry->type = fileDescriptor->type;
-    globalEntry->accessRights = fileDescriptor->accessRights;
-    globalEntry->size = fileDescriptor->size;
-    globalEntry->creationTime = fileDescriptor->creationTime;
-    globalEntry->lastAccessTime = fileDescriptor->lastAccessTime;
-    globalEntry->lastModificationTime = fileDescriptor->lastModificationTime;
-    globalEntry->owner = fileDescriptor->owner;
+    SIMFS_OPEN_FILE_GLOBAL_TABLE_TYPE *globalEntry = (SIMFS_OPEN_FILE_GLOBAL_TABLE_TYPE *)malloc(sizeof(SIMFS_OPEN_FILE_GLOBAL_TABLE_TYPE));
+//    SIMFS_FILE_DESCRIPTOR_TYPE *fileDescriptor = (SIMFS_FILE_DESCRIPTOR_TYPE*)malloc(sizeof(SIMFS_FILE_DESCRIPTOR_TYPE));
+//    simfsGetFileInfo(fileName,fileDescriptor);
+//    globalEntry->referenceCount = 0;
+//    globalEntry->type = fileDescriptor->type;
+//    globalEntry->accessRights = fileDescriptor->accessRights;
+//    globalEntry->size = fileDescriptor->size;
+//    globalEntry->creationTime = fileDescriptor->creationTime;
+//    globalEntry->lastAccessTime = fileDescriptor->lastAccessTime;
+//    globalEntry->lastModificationTime = fileDescriptor->lastModificationTime;
+//    globalEntry->owner = fileDescriptor->owner;
+//    globalEntry->fileDescriptor = index;
     globalEntry->fileDescriptor = index;
 
     return globalEntry;
@@ -664,7 +675,7 @@ SIMFS_ERROR simfsWriteFile(SIMFS_FILE_HANDLE_TYPE fileHandle, char *writeBuffer)
     if(foundFile == NULL || foundFile->type == INVALID_CONTENT_TYPE)
         return SIMFS_NOT_FOUND_ERROR;
     else if((foundFile->accessRights & writeRightAccessMask) != writeRightAccessMask){
-        return SIMFS_ACCESS_ERROR;
+        //return SIMFS_ACCESS_ERROR;
     }
     int numberOfBlocksNeeded = sizeof(writeBuffer)/SIMFS_BLOCK_SIZE;
     if(sizeof(writeBuffer)%SIMFS_BLOCK_SIZE > 0 || numberOfBlocksNeeded == 0)
@@ -672,48 +683,51 @@ SIMFS_ERROR simfsWriteFile(SIMFS_FILE_HANDLE_TYPE fileHandle, char *writeBuffer)
     if(!validNumberOfBlocksExist(numberOfBlocksNeeded))
         return SIMFS_ALLOC_ERROR;
 
-    SIMFS_FILE_DESCRIPTOR_TYPE writeToFileDescriptor = simfsVolume->block[foundFile->fileDescriptor].content.fileDescriptor;
-   if(simfsVolume->block[writeToFileDescriptor.block_ref].type == INDEX_CONTENT_TYPE){
+    SIMFS_FILE_DESCRIPTOR_TYPE *writeToFileDescriptor = &(simfsVolume->block[foundFile->fileDescriptor].content
+            .fileDescriptor);
+   if(simfsVolume->block[writeToFileDescriptor->block_ref].type == INDEX_CONTENT_TYPE){
         for(int i = 0; i < SIMFS_INDEX_SIZE;i++){
-            simfsFlipBit(simfsContext->bitvector,simfsVolume->block[writeToFileDescriptor.block_ref].content.index[i]);
+            simfsFlipBit(simfsContext->bitvector,simfsVolume->block[writeToFileDescriptor->block_ref].content.index[i]);
         }
     }
 
    //copy data
     int freeBitIndex;
-    SIMFS_BLOCK_TYPE referenceBlock;
+    SIMFS_BLOCK_TYPE *referenceBlock;
     //simfsFlipBit(simfsContext->bitvector,writeToFileDescriptor.block_ref);
     if(numberOfBlocksNeeded == 1){
         freeBitIndex = simfsFindFreeBlock(simfsContext->bitvector);
-        referenceBlock = simfsVolume->block[freeBitIndex];
-        referenceBlock.type = DATA_CONTENT_TYPE;
-        for(int i = 0; i < sizeof(writeBuffer); i++){
-            referenceBlock.content.data[i] = writeBuffer[i];
+        referenceBlock = &(simfsVolume->block[freeBitIndex]);
+        referenceBlock->type = DATA_CONTENT_TYPE;
+        writeToFileDescriptor->block_ref = freeBitIndex;
+        for(int i = 0; i < strlen(writeBuffer); i++){
+            referenceBlock->content.data[i] = writeBuffer[i];
         }
     }
     else{
         int indexOfWriteBuffer = 0;
         freeBitIndex = simfsFindFreeBlock(simfsContext->bitvector);
-        referenceBlock = simfsVolume->block[freeBitIndex];
-        referenceBlock.type = INDEX_CONTENT_TYPE;
+        referenceBlock = &(simfsVolume->block[freeBitIndex]);
+        referenceBlock->type = INDEX_CONTENT_TYPE;
         do {
             for (int i = 0; i < SIMFS_INDEX_SIZE - 1 && indexOfWriteBuffer < sizeof(writeBuffer)-1; i++) {
-                referenceBlock.content.index[i] = simfsFindFreeBlock(simfsContext);
-                simfsFlipBit(simfsContext->bitvector,referenceBlock.content.index[i]);
-                simfsVolume->block[referenceBlock.content.index[i]].type = DATA_CONTENT_TYPE;
+                referenceBlock->content.index[i] = simfsFindFreeBlock(simfsContext);
+                simfsFlipBit(simfsContext->bitvector,referenceBlock->content.index[i]);
+                simfsVolume->block[referenceBlock->content.index[i]].type = DATA_CONTENT_TYPE;
                 for (int j = 0; j < SIMFS_DATA_SIZE && indexOfWriteBuffer < sizeof(writeBuffer)-1; j++) {
-                    simfsVolume->block[referenceBlock.content.index[i]].content.data[j] = writeBuffer[indexOfWriteBuffer++];
+                    simfsVolume->block[referenceBlock->content.index[i]].content.data[j] =
+                            writeBuffer[indexOfWriteBuffer++];
                 }
             }
             freeBitIndex = simfsFindFreeBlock(simfsContext->bitvector);
             simfsFlipBit(simfsContext->bitvector,freeBitIndex);
-            referenceBlock = simfsVolume->block[freeBitIndex];
-            referenceBlock.type = INDEX_CONTENT_TYPE;
+            referenceBlock = &(simfsVolume->block[freeBitIndex]);
+            referenceBlock->type = INDEX_CONTENT_TYPE;
         }while(indexOfWriteBuffer < sizeof(writeBuffer));
     }
-    writeToFileDescriptor.size = sizeof(writeBuffer);
-    writeToFileDescriptor.lastAccessTime = time(0);
-    writeToFileDescriptor.lastModificationTime = writeToFileDescriptor.lastAccessTime;
+    writeToFileDescriptor->size = strlen(writeBuffer);
+    writeToFileDescriptor->lastAccessTime = time(0);
+    writeToFileDescriptor->lastModificationTime = writeToFileDescriptor->lastAccessTime;
 
     strcpy(simfsVolume->bitvector, simfsContext->bitvector);
     return SIMFS_NO_ERROR;
@@ -731,7 +745,7 @@ bool validNumberOfBlocksExist(int numberOfBlocksNeeded){
 				if(!(currentByteOfBitvector & bitMask)){
 					numberOfBlocksNeeded--;
 				}
-                fullMask>>=1;
+                bitMask>>=1;
 			}
 		}
 		if(numberOfBlocksNeeded == 0)
@@ -767,17 +781,18 @@ SIMFS_ERROR simfsReadFile(SIMFS_FILE_HANDLE_TYPE fileHandle, char **readBuffer) 
     if(foundFile == NULL || foundFile->type == INVALID_CONTENT_TYPE)
         return SIMFS_NOT_FOUND_ERROR;
     else if((foundFile->accessRights & readRightAccessMask) != readRightAccessMask){
-        return SIMFS_ACCESS_ERROR;
+        //return SIMFS_ACCESS_ERROR;
     }
-	size_t bufferLength = foundFile->size + 1;
-	readBuffer = (char**) malloc(bufferLength); //add one for the EOL char
+
 
 	int currentReadIndex = 0;
 	SIMFS_FILE_DESCRIPTOR_TYPE *readFileDescriptor = &(simfsVolume->block[foundFile->fileDescriptor].content
 	        .fileDescriptor);
+    size_t bufferLength = readFileDescriptor->size + 1;
+    *readBuffer = (char*) malloc(bufferLength);//malloc(bufferLength); //add one for the EOL char
 	SIMFS_DATA_TYPE *currentDataBlock;
 	SIMFS_INDEX_TYPE *currentIndexBlock;
-	if(bufferLength  > SIMFS_BLOCK_SIZE){
+	if(bufferLength  > SIMFS_DATA_SIZE){
 		currentIndexBlock = simfsVolume->block[readFileDescriptor->block_ref].content.index;
 		do{
 			for(int i = 0; i < SIMFS_INDEX_SIZE - 1 && currentReadIndex < bufferLength; i++){
@@ -791,6 +806,7 @@ SIMFS_ERROR simfsReadFile(SIMFS_FILE_HANDLE_TYPE fileHandle, char **readBuffer) 
 		(*readBuffer)[currentReadIndex] = '\0';
 	}
 	else{
+	    strcpy(*readBuffer,simfsVolume->block[readFileDescriptor->block_ref].content.data);
 	}
 	readFileDescriptor->lastAccessTime = time(0);
     return SIMFS_NO_ERROR;

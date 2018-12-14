@@ -1,3 +1,8 @@
+/**
+* Name: Samier Mahagna
+* Project 1
+* Date: 11/13/18
+**/
 #ifndef __SIMFS_H_
 #define __SIMFS_H_
 

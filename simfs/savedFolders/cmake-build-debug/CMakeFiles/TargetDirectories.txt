@@ -1,0 +1,3 @@
+/home/samier/Desktop/School/Fall2018/Operating-Systems/Project1/simfs/cmake-build-debug/CMakeFiles/rebuild_cache.dir
+/home/samier/Desktop/School/Fall2018/Operating-Systems/Project1/simfs/cmake-build-debug/CMakeFiles/edit_cache.dir
+/home/samier/Desktop/School/Fall2018/Operating-Systems/Project1/simfs/cmake-build-debug/CMakeFiles/simfs.dir

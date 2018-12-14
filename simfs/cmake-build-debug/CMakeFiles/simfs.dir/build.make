@@ -94,7 +94,6 @@ simfs_EXTERNAL_OBJECTS =
 bin/simfs: CMakeFiles/simfs.dir/test_simfs.c.o
 bin/simfs: CMakeFiles/simfs.dir/simfs.c.o
 bin/simfs: CMakeFiles/simfs.dir/build.make
-bin/simfs: /usr/lib/x86_64-linux-gnu/libfuse.so
 bin/simfs: CMakeFiles/simfs.dir/link.txt
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/samier/Desktop/School/Fall2018/Operating-Systems/Project1/simfs/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Linking C executable bin/simfs"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/simfs.dir/link.txt --verbose=$(VERBOSE)

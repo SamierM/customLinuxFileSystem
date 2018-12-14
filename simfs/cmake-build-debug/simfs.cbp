@@ -5,7 +5,7 @@
 		<Option title="simfs"/>
 		<Option makefile_is_custom="1"/>
 		<Option compiler="gcc"/>
-		<Option virtualFolders="CMake Files\;CMake Files\CMake\;"/>
+		<Option virtualFolders="CMake Files\;"/>
 		<Build>
 			<Target title="all">
 				<Option working_dir="/home/samier/Desktop/School/Fall2018/Operating-Systems/Project1/simfs/cmake-build-debug"/>
@@ -44,7 +44,6 @@
 				<Option type="1"/>
 				<Option compiler="gcc"/>
 				<Compiler>
-					<Add directory="/usr/include/fuse"/>
 					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/7/include"/>
 					<Add directory="/usr/local/include"/>
 					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/7/include-fixed"/>
@@ -65,7 +64,6 @@
 				<Option type="1"/>
 				<Option compiler="gcc"/>
 				<Compiler>
-					<Add directory="/usr/include/fuse"/>
 					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/7/include"/>
 					<Add directory="/usr/local/include"/>
 					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/7/include-fixed"/>
@@ -91,9 +89,6 @@
 		</Unit>
 		<Unit filename="/home/samier/Desktop/School/Fall2018/Operating-Systems/Project1/simfs/CMakeLists.txt">
 			<Option virtualFolder="CMake Files\"/>
-		</Unit>
-		<Unit filename="/home/samier/Desktop/School/Fall2018/Operating-Systems/Project1/simfs/CMake/FindFUSE.cmake">
-			<Option virtualFolder="CMake Files\CMake\"/>
 		</Unit>
 	</Project>
 </CodeBlocks_project_file>

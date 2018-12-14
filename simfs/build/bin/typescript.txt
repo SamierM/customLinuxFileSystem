@@ -1,0 +1,83 @@
+Script started on 2018-12-13 23:46:26-0800
+]0;samier@samier-XPS-15-9560: ~/Desktop/School/Fall2018/Operating-Systems/Project1/simfs/build/bin[01;32msamier@samier-XPS-15-9560[00m:[01;34m~/Desktop/School/Fall2018/Operating-Systems/Project1/simfs/build/bin[00m$ ./simfs  [A
+testFileForCreate created successfully!
+simfsCreateFile detected duplicate successfully
+
+
+
+Expected: testFileForCreate !got: 
+Expected: FILE_CONTENT_TYPE/1 got: 0
+
+
+
+
+Correctly could not open the file!
+Correctly opened test file with file handle: 
+
+
+
+Made it through write file and should print the following in read file: 
+Please print
+We should get Please print got Please print
+
+
+We correctly did not find the file!
+Correctly deleted the test file!
+
+
+]0;samier@samier-XPS-15-9560: ~/Desktop/School/Fall2018/Operating-Systems/Project1/simfs/build/bin[01;32msamier@samier-XPS-15-9560[00m:[01;34m~/Desktop/School/Fall2018/Operating-Systems/Project1/simfs/build/bin[00m$ ./simfs  [A
+testFileForCreate created successfully!
+simfsCreateFile detected duplicate successfully
+
+
+
+Expected: testFileForCreate !got: 
+Expected: FILE_CONTENT_TYPE/1 got: 0
+
+
+
+
+Correctly could not open the file!
+Correctly opened test file with file handle: 
+
+
+
+Made it through write file and should print the following in read file: 
+Please print
+We should get Please print got Please print
+
+
+We correctly did not find the file!
+Correctly deleted the test file!
+
+
+]0;samier@samier-XPS-15-9560: ~/Desktop/School/Fall2018/Operating-Systems/Project1/simfs/build/bin[01;32msamier@samier-XPS-15-9560[00m:[01;34m~/Desktop/School/Fall2018/Operating-Systems/Project1/simfs/build/bin[00m$ ./simfs  [A
+testFileForCreate created successfully!
+simfsCreateFile detected duplicate successfully
+
+
+
+Expected: testFileForCreate !got: 
+Expected: FILE_CONTENT_TYPE/1 got: 0
+
+
+
+
+Correctly could not open the file!
+Correctly opened test file with file handle: 
+
+
+
+Made it through write file and should print the following in read file: 
+Please print
+We should get Please print got Please print
+
+
+We correctly did not find the file!
+Correctly deleted the test file!
+
+
+]0;samier@samier-XPS-15-9560: ~/Desktop/School/Fall2018/Operating-Systems/Project1/simfs/build/bin[01;32msamier@samier-XPS-15-9560[00m:[01;34m~/Desktop/School/Fall2018/Operating-Systems/Project1/simfs/build/bin[00m$ exit
+exit
+
+Script done on 2018-12-13 23:48:08-0800
