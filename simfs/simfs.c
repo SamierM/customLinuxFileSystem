@@ -562,6 +562,7 @@ int currentProcessHasFile(SIMFS_PROCESS_CONTROL_BLOCK_TYPE *processBlockEntry,ch
 }
 
 SIMFS_OPEN_FILE_GLOBAL_TABLE_TYPE* createGlobalFileTableEntry(char* fileName, SIMFS_INDEX_TYPE index){
+
     SIMFS_OPEN_FILE_GLOBAL_TABLE_TYPE *globalEntry = (SIMFS_OPEN_FILE_GLOBAL_TABLE_TYPE *)malloc(sizeof(fileName));
     SIMFS_FILE_DESCRIPTOR_TYPE *fileDescriptor = (SIMFS_FILE_DESCRIPTOR_TYPE*)malloc(sizeof(SIMFS_FILE_DESCRIPTOR_TYPE));
     simfsGetFileInfo(fileName,fileDescriptor);
@@ -719,8 +720,22 @@ SIMFS_ERROR simfsWriteFile(SIMFS_FILE_HANDLE_TYPE fileHandle, char *writeBuffer)
 }
 
 bool validNumberOfBlocksExist(int numberOfBlocksNeeded){
-    for(int i = 0; i < SIMFS_NUMBER_OF_BLOCKS/8; i++){
+	char currentByteOfBitvector;
+	unsigned char fullMask = 0xFF;
 
+    for(int i = 0; i < SIMFS_NUMBER_OF_BLOCKS/8; i++){
+		currentByteOfBitvector = simfsContext->bitvector[i];
+		unsigned char bitMask = 0x80;
+		if(currentByteOfBitvector != fullMask){
+			for(int j = 0; j < 8 && numberOfBlocksNeeded > 0; j++){
+				if(!(currentByteOfBitvector & bitMask)){
+					numberOfBlocksNeeded--;
+				}
+                fullMask>>=1;
+			}
+		}
+		if(numberOfBlocksNeeded == 0)
+			return true;
     }
     return false;
 }
@@ -746,8 +761,38 @@ bool validNumberOfBlocksExist(int numberOfBlocksNeeded){
  *
  */
 SIMFS_ERROR simfsReadFile(SIMFS_FILE_HANDLE_TYPE fileHandle, char **readBuffer) {
-    // TODO: implement
+    SIMFS_OPEN_FILE_GLOBAL_TABLE_TYPE *foundFile = &(simfsContext->globalOpenFileTable[fileHandle]);
+    unsigned short readRightAccessMask = 0x80;
 
+    if(foundFile == NULL || foundFile->type == INVALID_CONTENT_TYPE)
+        return SIMFS_NOT_FOUND_ERROR;
+    else if((foundFile->accessRights & readRightAccessMask) != readRightAccessMask){
+        return SIMFS_ACCESS_ERROR;
+    }
+	size_t bufferLength = foundFile->size + 1;
+	readBuffer = (char**) malloc(bufferLength); //add one for the EOL char
+
+	int currentReadIndex = 0;
+	SIMFS_FILE_DESCRIPTOR_TYPE *readFileDescriptor = &(simfsVolume->block[foundFile->fileDescriptor].content
+	        .fileDescriptor);
+	SIMFS_DATA_TYPE *currentDataBlock;
+	SIMFS_INDEX_TYPE *currentIndexBlock;
+	if(bufferLength  > SIMFS_BLOCK_SIZE){
+		currentIndexBlock = simfsVolume->block[readFileDescriptor->block_ref].content.index;
+		do{
+			for(int i = 0; i < SIMFS_INDEX_SIZE - 1 && currentReadIndex < bufferLength; i++){
+				currentDataBlock = &(simfsVolume->block[currentIndexBlock[i]].content.data);
+				for(int j = 0; j < SIMFS_DATA_SIZE; j++){
+					(*readBuffer)[currentReadIndex++] = (char)currentDataBlock[j];
+				}
+			}
+			currentIndexBlock = simfsVolume->block[currentIndexBlock[SIMFS_INDEX_SIZE - 1]].content.index;
+		}while(currentReadIndex < bufferLength);
+		(*readBuffer)[currentReadIndex] = '\0';
+	}
+	else{
+	}
+	readFileDescriptor->lastAccessTime = time(0);
     return SIMFS_NO_ERROR;
 }
 
