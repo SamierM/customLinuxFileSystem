@@ -657,9 +657,72 @@ SIMFS_ERROR assignGlobalEntry(SIMFS_OPEN_FILE_GLOBAL_TABLE_TYPE *globalEntry){
  *
  */
 SIMFS_ERROR simfsWriteFile(SIMFS_FILE_HANDLE_TYPE fileHandle, char *writeBuffer) {
-    
+    SIMFS_OPEN_FILE_GLOBAL_TABLE_TYPE *foundFile = &(simfsContext->globalOpenFileTable[fileHandle]);
+    unsigned short writeRightAccessMask = 0200;
 
+    if(foundFile == NULL || foundFile->type == INVALID_CONTENT_TYPE)
+        return SIMFS_NOT_FOUND_ERROR;
+    else if((foundFile->accessRights & writeRightAccessMask) != writeRightAccessMask){
+        return SIMFS_ACCESS_ERROR;
+    }
+    int numberOfBlocksNeeded = sizeof(writeBuffer)/SIMFS_BLOCK_SIZE;
+    if(sizeof(writeBuffer)%SIMFS_BLOCK_SIZE > 0 || numberOfBlocksNeeded == 0)
+        numberOfBlocksNeeded++;
+    if(!validNumberOfBlocksExist(numberOfBlocksNeeded))
+        return SIMFS_ALLOC_ERROR;
+
+    SIMFS_FILE_DESCRIPTOR_TYPE writeToFileDescriptor = simfsVolume->block[foundFile->fileDescriptor].content.fileDescriptor;
+   if(simfsVolume->block[writeToFileDescriptor.block_ref].type == INDEX_CONTENT_TYPE){
+        for(int i = 0; i < SIMFS_INDEX_SIZE;i++){
+            simfsFlipBit(simfsContext->bitvector,simfsVolume->block[writeToFileDescriptor.block_ref].content.index[i]);
+        }
+    }
+
+   //copy data
+    int freeBitIndex;
+    SIMFS_BLOCK_TYPE referenceBlock;
+    //simfsFlipBit(simfsContext->bitvector,writeToFileDescriptor.block_ref);
+    if(numberOfBlocksNeeded == 1){
+        freeBitIndex = simfsFindFreeBlock(simfsContext->bitvector);
+        referenceBlock = simfsVolume->block[freeBitIndex];
+        referenceBlock.type = DATA_CONTENT_TYPE;
+        for(int i = 0; i < sizeof(writeBuffer); i++){
+            referenceBlock.content.data[i] = writeBuffer[i];
+        }
+    }
+    else{
+        int indexOfWriteBuffer = 0;
+        freeBitIndex = simfsFindFreeBlock(simfsContext->bitvector);
+        referenceBlock = simfsVolume->block[freeBitIndex];
+        referenceBlock.type = INDEX_CONTENT_TYPE;
+        do {
+            for (int i = 0; i < SIMFS_INDEX_SIZE - 1 && indexOfWriteBuffer < sizeof(writeBuffer)-1; i++) {
+                referenceBlock.content.index[i] = simfsFindFreeBlock(simfsContext);
+                simfsFlipBit(simfsContext->bitvector,referenceBlock.content.index[i]);
+                simfsVolume->block[referenceBlock.content.index[i]].type = DATA_CONTENT_TYPE;
+                for (int j = 0; j < SIMFS_DATA_SIZE && indexOfWriteBuffer < sizeof(writeBuffer)-1; j++) {
+                    simfsVolume->block[referenceBlock.content.index[i]].content.data[j] = writeBuffer[indexOfWriteBuffer++];
+                }
+            }
+            freeBitIndex = simfsFindFreeBlock(simfsContext->bitvector);
+            simfsFlipBit(simfsContext->bitvector,freeBitIndex);
+            referenceBlock = simfsVolume->block[freeBitIndex];
+            referenceBlock.type = INDEX_CONTENT_TYPE;
+        }while(indexOfWriteBuffer < sizeof(writeBuffer));
+    }
+    writeToFileDescriptor.size = sizeof(writeBuffer);
+    writeToFileDescriptor.lastAccessTime = time(0);
+    writeToFileDescriptor.lastModificationTime = writeToFileDescriptor.lastAccessTime;
+
+    strcpy(simfsVolume->bitvector, simfsContext->bitvector);
     return SIMFS_NO_ERROR;
+}
+
+bool validNumberOfBlocksExist(int numberOfBlocksNeeded){
+    for(int i = 0; i < SIMFS_NUMBER_OF_BLOCKS/8; i++){
+
+    }
+    return false;
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -712,6 +775,7 @@ SIMFS_ERROR simfsCloseFile(SIMFS_FILE_HANDLE_TYPE fileHandle) {
         if(currentProcessBlock->pid == currentContext->pid){
             if(--currentProcessBlock->numberOfOpenFiles == 0){ //deletes from process list if process has no other files
                 prevProcessBlock->next = currentProcessBlock->next;
+                currentProcessBlock->next = NULL;
             }
             globalReference = &(currentProcessBlock->openFileTable[fileHandle]);
             if(--globalReference->globalEntry->referenceCount == 0){

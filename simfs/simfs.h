@@ -248,6 +248,7 @@ SIMFS_PROCESS_CONTROL_BLOCK_TYPE* createProcessEntry(struct fuse_context *contex
 SIMFS_ERROR assignProcessTableEntryIndex(SIMFS_OPEN_FILE_GLOBAL_TABLE_TYPE *globalEntry,SIMFS_PROCESS_CONTROL_BLOCK_TYPE
 *processBlockEntry);
 SIMFS_ERROR assignGlobalEntry(SIMFS_OPEN_FILE_GLOBAL_TABLE_TYPE *globalEntry);
+bool validNumberOfBlocksExist(int numberOfBlocksNeeded);
 
 /*
  * The following functions can be used to simulate FUSE context's user and process identifiers for testing.
